@@ -1851,10 +1851,10 @@
                 else if (type === 'account') {
                     const account = {
                         id: isEdit ? document.getElementById('account-id').value : Date.now().toString(),
-                        name:                        bankId: document.getElementById('account-bank').value,
+                        name: document.getElementById('account-name').value,
+                        bankId: document.getElementById('account-bank').value,
                         type: document.getElementById('account-type').value,
-                        balance: parseFloat(document.getElementById('account-balance').value),
-                        createdAt: isEdit ? this.accounts.find(a => a.id === account.id).createdAt : Date.now()
+                        balance: parseFloat(document.getElementById('account-balance').value)
                     };
                     
                     if (isEdit) {
@@ -1871,11 +1871,11 @@
                 else if (type === 'transaction') {
                     const transaction = {
                         id: isEdit ? document.getElementById('transaction-id').value : Date.now().toString(),
+                        description: document.getElementById('transaction-description').value,
                         accountId: document.getElementById('transaction-account').value,
                         amount: parseFloat(document.getElementById('transaction-amount').value),
                         type: document.getElementById('transaction-type').value,
                         category: document.getElementById('transaction-category').value,
-                        description: document.getElementById('transaction-description').value,
                         date: new Date(document.getElementById('transaction-date').value).getTime(),
                         notes: document.getElementById('transaction-notes').value,
                         simulation: false
@@ -1888,13 +1888,20 @@
                             // Annuler l'ancienne transaction
                             const oldTransaction = this.transactions.find(t => t.id === transaction.id);
                             if (oldTransaction) {
-                                account.balance += oldTransaction.type === 'income' ? -oldTransaction.amount : oldTransaction.amount;
+                                if (oldTransaction.type === 'income') {
+                                    account.balance -= oldTransaction.amount;
+                                } else {
+                                    account.balance += oldTransaction.amount;
+                                }
                             }
                         }
                         
                         // Appliquer la nouvelle transaction
-                        account.balance += transaction.type === 'income' ? transaction.amount : -transaction.amount;
-                        localStorage.setItem('accounts', JSON.stringify(this.accounts));
+                        if (transaction.type === 'income') {
+                            account.balance += transaction.amount;
+                        } else {
+                            account.balance -= transaction.amount;
+                        }
                     }
                     
                     if (isEdit) {
@@ -1904,7 +1911,9 @@
                         this.transactions.push(transaction);
                     }
                     
+                    localStorage.setItem('accounts', JSON.stringify(this.accounts));
                     localStorage.setItem('transactions', JSON.stringify(this.transactions));
+                    this.loadAccounts();
                     this.loadTransactions();
                     this.updateDashboards();
                 }
@@ -1917,13 +1926,11 @@
                         interval: parseInt(document.getElementById('transfer-interval').value),
                         transferType: document.getElementById('transfer-type').value,
                         notes: document.getElementById('transfer-notes').value,
-                        nextExecution: isEdit ? this.transfers.find(t => t.id === transfer.id).nextExecution : Date.now(),
-                        createdAt: isEdit ? this.transfers.find(t => t.id === transfer.id).createdAt : Date.now()
+                        nextExecution: isEdit ? this.transfers.find(t => t.id === transfer.id).nextExecution : Date.now()
                     };
                     
-                    // Vérifier que les comptes sont différents
                     if (transfer.fromAccountId === transfer.toAccountId) {
-                        alert("Les comptes source et destination doivent être différents");
+                        alert('Le compte source et le compte destination doivent être différents');
                         return;
                     }
                     
@@ -1963,14 +1970,19 @@
                 const tbody = document.querySelector('#banks-table tbody');
                 tbody.innerHTML = '';
                 
+                if (this.banks.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Aucune banque enregistrée</td></tr>`;
+                    return;
+                }
+                
                 this.banks.forEach(bank => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td>${bank.name}</td>
                         <td>${bank.code}</td>
-                        <td>${bank.country || 'N/A'}</td>
+                        <td>${bank.country || 'Non spécifié'}</td>
                         <td>${bank.type.charAt(0).toUpperCase() + bank.type.slice(1)}</td>
-                        <td>
+                        <td class="actions-cell">
                             <button onclick="app.showBankForm(${JSON.stringify(bank)})"><i class="fas fa-edit icon"></i>Modifier</button>
                             <button class="delete" onclick="app.deleteBank('${bank.id}')"><i class="fas fa-trash icon"></i>Supprimer</button>
                         </td>
@@ -1983,39 +1995,36 @@
                 const tbody = document.querySelector('#accounts-table tbody');
                 tbody.innerHTML = '';
                 
+                if (this.accounts.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Aucun compte enregistré</td></tr>`;
+                    return;
+                }
+                
                 this.accounts.forEach(account => {
                     const bank = this.banks.find(b => b.id === account.bankId);
-                    const accountType = this.accountTypes[account.type];
-                    
                     const tr = document.createElement('tr');
                     tr.className = `account-${account.type}`;
                     tr.innerHTML = `
                         <td>${account.name}</td>
-                        <td><span class="badge badge-${accountType.color}">${accountType.name}</span></td>
+                        <td><span class="badge badge-${this.accountTypes[account.type].color}">${this.accountTypes[account.type].name}</span></td>
                         <td>${bank ? bank.name : 'Inconnue'}</td>
                         <td class="${account.balance >= 0 ? 'positive' : 'negative'}">${account.balance.toFixed(2)} €</td>
-                        <td>
+                        <td class="actions-cell">
                             <button onclick="app.showAccountForm(null, ${JSON.stringify(account)})"><i class="fas fa-edit icon"></i>Modifier</button>
                             <button class="delete" onclick="app.deleteAccount('${account.id}')"><i class="fas fa-trash icon"></i>Supprimer</button>
                         </td>
                     `;
                     tbody.appendChild(tr);
                 });
-                
-                this.filterAccounts('all');
             },
             
             filterAccounts: function(filter) {
                 const rows = document.querySelectorAll('#accounts-table tbody tr');
-                
                 rows.forEach(row => {
-                    const type = row.classList.contains('account-personal') ? 'personal' : 
-                                row.classList.contains('account-business') ? 'business' : 'offshore';
-                    
-                    if (filter === 'all' || filter === type) {
+                    if (filter === 'all') {
                         row.style.display = '';
                     } else {
-                        row.style.display = 'none';
+                        row.style.display = row.classList.contains(`account-${filter}`) ? '' : 'none';
                     }
                 });
             },
@@ -2024,6 +2033,11 @@
                 const tbody = document.querySelector('#transfers-table tbody');
                 tbody.innerHTML = '';
                 
+                if (this.transfers.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">Aucun virement programmé</td></tr>`;
+                    return;
+                }
+                
                 this.transfers.forEach(transfer => {
                     const fromAccount = this.accounts.find(a => a.id === transfer.fromAccountId);
                     const toAccount = this.accounts.find(a => a.id === transfer.toAccountId);
@@ -2031,13 +2045,13 @@
                     
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td>${fromAccount ? fromAccount.name : 'Compte inconnu'} (${fromAccount ? this.accountTypes[fromAccount.type].name : '?'})</td>
-                        <td>${toAccount ? toAccount.name : 'Compte inconnu'} (${toAccount ? this.accountTypes[toAccount.type].name : '?'})</td>
-                        <td class="${transfer.amount >= 0 ? 'positive' : 'negative'}">${transfer.amount.toFixed(2)} €</td>
-                        <td><span class="badge badge-${transfer.transferType === 'offshore' ? 'offshore' : 'simulation'}">${transfer.transferType === 'offshore' ? 'Offshore' : 'Normal'}</span></td>
-                        <td>${transfer.interval}s</td>
+                        <td>${fromAccount ? fromAccount.name : 'Compte inconnu'}</td>
+                        <td>${toAccount ? toAccount.name : 'Compte inconnu'}</td>
+                        <td>${transfer.amount.toFixed(2)} €</td>
+                        <td><span class="badge ${transfer.transferType === 'offshore' ? 'badge-offshore' : ''}">${transfer.transferType === 'offshore' ? 'Offshore' : 'Normal'}</span></td>
+                        <td>${transfer.interval}</td>
                         <td>${nextDate.toLocaleString()}</td>
-                        <td>
+                        <td class="actions-cell">
                             <button onclick="app.showTransferForm(null, ${JSON.stringify(transfer)})"><i class="fas fa-edit icon"></i>Modifier</button>
                             <button class="delete" onclick="app.deleteTransfer('${transfer.id}')"><i class="fas fa-trash icon"></i>Supprimer</button>
                         </td>
@@ -2050,6 +2064,11 @@
                 const tbody = document.querySelector('#transactions-table tbody');
                 tbody.innerHTML = '';
                 
+                if (this.transactions.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Aucune transaction enregistrée</td></tr>`;
+                    return;
+                }
+                
                 // Trier par date (plus récent en premier)
                 const sortedTransactions = [...this.transactions].sort((a, b) => b.date - a.date);
                 
@@ -2058,72 +2077,75 @@
                     const date = new Date(transaction.date);
                     
                     const tr = document.createElement('tr');
-                    tr.className = transaction.simulation ? 'simulation' : '';
+                    if (transaction.simulation) {
+                        tr.classList.add('simulation-transaction');
+                    }
+                    
                     tr.innerHTML = `
                         <td>${date.toLocaleDateString()} ${date.toLocaleTimeString()}</td>
                         <td>${transaction.description}</td>
-                        <td>${account ? account.name : 'Compte supprimé'} (${account ? this.accountTypes[account.type].name : '?'})</td>
-                        <td class="${transaction.type === 'income' ? 'positive' : 'negative'}">${transaction.amount.toFixed(2)} €</td>
+                        <td>${account ? account.name : 'Compte inconnu'}</td>
+                        <td class="${transaction.type === 'income' ? 'positive' : 'negative'}">
+                            ${transaction.type === 'income' ? '+' : '-'}${transaction.amount.toFixed(2)} €
+                        </td>
                         <td>${transaction.category}</td>
-                        <td>
-                            <button onclick="app.showTransactionForm(null, ${JSON.stringify(transaction)})"><i class="fas fa-edit icon"></i></button>
-                            <button class="delete" onclick="app.deleteTransaction('${transaction.id}')"><i class="fas fa-trash icon"></i></button>
+                        <td class="actions-cell">
+                            <button onclick="app.showTransactionForm(null, ${JSON.stringify(transaction)})"><i class="fas fa-edit icon"></i>Modifier</button>
+                            <button class="delete" onclick="app.deleteTransaction('${transaction.id}')"><i class="fas fa-trash icon"></i>Supprimer</button>
                         </td>
                     `;
                     tbody.appendChild(tr);
                 });
-                
-                this.filterTransactions('all');
             },
             
             filterTransactions: function(filter) {
                 const rows = document.querySelectorAll('#transactions-table tbody tr');
-                
-                rows.forEach(row => {
-                    const isIncome = row.querySelector('td:nth-child(4)').classList.contains('positive');
-                    const isTransfer = row.querySelector('td:nth-child(2)').textContent.toLowerCase().includes('virement');
-                    const isSimulation = row.classList.contains('simulation');
-                    
-                    if (filter === 'all' || 
-                        (filter === 'income' && isIncome) || 
-                        (filter === 'expense' && !isIncome) ||
-                        (filter === 'transfer' && isTransfer) ||
-                        (filter === 'simulation' && isSimulation)) {
+                rows.forEach((row, index) => {
+                    if (filter === 'all') {
                         row.style.display = '';
+                    } else if (filter === 'simulation') {
+                        row.style.display = row.classList.contains('simulation-transaction') ? '' : 'none';
                     } else {
-                        row.style.display = 'none';
+                        const transaction = [...this.transactions].sort((a, b) => b.date - a.date)[index];
+                        row.style.display = transaction.type === filter ? '' : 'none';
                     }
                 });
             },
             
             // Suppression d'éléments
             deleteBank: function(id) {
-                if (confirm('Voulez-vous vraiment supprimer cette banque ? Les comptes associés seront conservés mais sans lien avec cette banque.')) {
+                if (confirm('Voulez-vous vraiment supprimer cette banque ? Cette action supprimera aussi tous les comptes associés.')) {
                     this.banks = this.banks.filter(bank => bank.id !== id);
                     localStorage.setItem('banks', JSON.stringify(this.banks));
                     this.loadBanks();
+                    
+                    // Supprimer aussi les comptes associés
+                    this.accounts = this.accounts.filter(account => account.bankId !== id);
+                    localStorage.setItem('accounts', JSON.stringify(this.accounts));
+                    this.loadAccounts();
+                    
+                    this.updateDashboards();
                 }
             },
             
             deleteAccount: function(id) {
-                if (confirm('Voulez-vous vraiment supprimer ce compte ? Toutes les transactions et virements associés seront également supprimés.')) {
+                if (confirm('Voulez-vous vraiment supprimer ce compte ? Cette action supprimera aussi tous les virements et transactions associés.')) {
+                    this.accounts = this.accounts.filter(account => account.id !== id);
+                    localStorage.setItem('accounts', JSON.stringify(this.accounts));
+                    this.loadAccounts();
+                    
+                    // Supprimer aussi les virements associés
+                    this.transfers = this.transfers.filter(transfer => 
+                        transfer.fromAccountId !== id && transfer.toAccountId !== id
+                    );
+                    localStorage.setItem('transfers', JSON.stringify(this.transfers));
+                    this.loadTransfers();
+                    
                     // Supprimer les transactions associées
                     this.transactions = this.transactions.filter(t => t.accountId !== id);
                     localStorage.setItem('transactions', JSON.stringify(this.transactions));
-                    
-                    // Supprimer les virements associés
-                    this.transfers = this.transfers.filter(t => 
-                        t.fromAccountId !== id && t.toAccountId !== id
-                    );
-                    localStorage.setItem('transfers', JSON.stringify(this.transfers));
-                    
-                    // Supprimer le compte
-                    this.accounts = this.accounts.filter(account => account.id !== id);
-                    localStorage.setItem('accounts', JSON.stringify(this.accounts));
-                    
-                    this.loadAccounts();
                     this.loadTransactions();
-                    this.loadTransfers();
+                    
                     this.updateDashboards();
                 }
             },
@@ -2145,20 +2167,30 @@
             
             deleteTransaction: function(id) {
                 if (confirm('Voulez-vous vraiment supprimer cette transaction ?')) {
+                    // Récupérer la transaction avant suppression
                     const transaction = this.transactions.find(t => t.id === id);
                     
-                    // Annuler l'impact sur le compte
+                    // Annuler l'effet sur le solde du compte
                     if (transaction) {
                         const account = this.accounts.find(a => a.id === transaction.accountId);
                         if (account) {
-                            account.balance += transaction.type === 'income' ? -transaction.amount : transaction.amount;
-                            localStorage.setItem('accounts', JSON.stringify(this.accounts));
+                            if (transaction.type === 'income') {
+                                account.balance -= transaction.amount;
+                            } else {
+                                account.balance += transaction.amount;
+                            }
                         }
                     }
                     
+                    // Supprimer la transaction
                     this.transactions = this.transactions.filter(t => t.id !== id);
+                    
+                    // Sauvegarder les modifications
+                    localStorage.setItem('accounts', JSON.stringify(this.accounts));
                     localStorage.setItem('transactions', JSON.stringify(this.transactions));
                     
+                    // Recharger les affichages
+                    this.loadAccounts();
                     this.loadTransactions();
                     this.updateDashboards();
                 }
@@ -2196,13 +2228,13 @@
                 const toAccount = this.accounts.find(a => a.id === transfer.toAccountId);
                 
                 if (!fromAccount || !toAccount) {
-                    this.logEvent('Un des comptes pour ce virement n\'existe plus ! Suppression du virement.');
+                    alert('Un des comptes pour ce virement n\'existe plus !');
                     this.deleteTransfer(transfer.id);
                     return;
                 }
                 
                 if (fromAccount.balance < transfer.amount) {
-                    this.logEvent(`Fonds insuffisants sur le compte ${fromAccount.name} pour le virement programmé de ${transfer.amount.toFixed(2)}€`);
+                    alert(`Fonds insuffisants sur le compte ${fromAccount.name} pour le virement !`);
                     return;
                 }
                 
@@ -2210,62 +2242,75 @@
                 fromAccount.balance -= transfer.amount;
                 toAccount.balance += transfer.amount;
                 
-                // Enregistrer les transactions
-                const now = Date.now();
-                const transactionBase = {
-                    date: now,
-                    simulation: false,
-                    notes: transfer.notes || `Virement programmé ${transfer.transferType === 'offshore' ? 'offshore' : ''}`
-                };
-                
-                // Transaction de sortie
-                this.transactions.push({
-                    ...transactionBase,
-                    id: `out_${now}`,
+                // Enregistrer la transaction
+                const transaction = {
+                    id: Date.now().toString(),
+                    description: `Virement ${transfer.transferType === 'offshore' ? 'offshore' : ''} vers ${toAccount.name}`,
                     accountId: fromAccount.id,
                     amount: transfer.amount,
                     type: 'expense',
                     category: 'Virement',
-                    description: `Virement vers ${toAccount.name}`
-                });
+                    date: Date.now(),
+                    notes: transfer.notes || '',
+                    simulation: false
+                };
                 
-                // Transaction d'entrée
-                this.transactions.push({
-                    ...transactionBase,
-                    id: `in_${now}`,
+                this.addTransaction(transaction);
+                
+                // Enregistrer aussi la réception pour le compte destinataire
+                const receivingTransaction = {
+                    id: Date.now().toString() + '-in',
+                    description: `Virement ${transfer.transferType === 'offshore' ? 'offshore' : ''} de ${fromAccount.name}`,
                     accountId: toAccount.id,
                     amount: transfer.amount,
                     type: 'income',
                     category: 'Virement',
-                    description: `Virement de ${fromAccount.name}`
-                });
+                    date: Date.now(),
+                    notes: transfer.notes || '',
+                    simulation: false
+                };
+                
+                this.addTransaction(receivingTransaction);
                 
                 // Mettre à jour la date de prochaine exécution
-                transfer.nextExecution = now + transfer.interval * 1000;
+                transfer.nextExecution = Date.now() + transfer.interval * 1000;
                 
                 // Sauvegarder les modifications
                 localStorage.setItem('accounts', JSON.stringify(this.accounts));
-                localStorage.setItem('transactions', JSON.stringify(this.transactions));
                 localStorage.setItem('transfers', JSON.stringify(this.transfers));
                 
                 // Recharger les affichages
-                this.loadTransactions();
+                this.loadAccounts();
                 this.loadTransfers();
                 this.updateDashboards();
                 
-                this.logEvent(`Virement de ${transfer.amount.toFixed(2)}€ effectué de ${fromAccount.name} vers ${toAccount.name}`);
+                console.log(`Virement de ${transfer.amount}€ effectué de ${fromAccount.name} vers ${toAccount.name}`);
             },
             
-            // Fonction utilitaire pour formater les montants
-            formatMoney: function(amount) {
-                return amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + ' €';
+            // Ajouter une transaction (avec gestion des doublons)
+            addTransaction: function(transaction) {
+                // Vérifier si la transaction existe déjà
+                const exists = this.transactions.some(t => 
+                    t.id === transaction.id || 
+                    (t.accountId === transaction.accountId && 
+                     t.amount === transaction.amount && 
+                     t.description === transaction.description && 
+                     Math.abs(t.date - transaction.date) < 1000)
+                );
+                
+                if (!exists) {
+                    this.transactions.push(transaction);
+                    localStorage.setItem('transactions', JSON.stringify(this.transactions));
+                    this.loadTransactions();
+                }
             }
         };
         
-        // Initialiser l'application lorsque la page est chargée
-        document.addEventListener('DOMContentLoaded', function() {
-            app.init();
-        });
+        // Initialiser l'application
+        document.addEventListener('DOMContentLoaded', () => app.init());
+        
+        // Exposer l'objet app globalement pour les événements onclick
+        window.app = app;
     </script>
 </body>
 </html>
