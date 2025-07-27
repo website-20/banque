@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulation Économique Pro - Gestion Bancaire Complète</title>
+    <title>Gestion Bancaire Pro - Solution Complète</title>
     <style>
         :root {
             --primary-color: #3498db;
@@ -15,6 +16,7 @@
             --business-color: #1abc9c;
             --offshore-color: #34495e;
             --simulation-color: #e67e22;
+            --admin-color: #8e44ad;
             --light-color: #ecf0f1;
             --dark-color: #34495e;
             --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -390,6 +392,14 @@
             background: #d35400;
         }
         
+        button.admin {
+            background: var(--admin-color);
+        }
+        
+        button.admin:hover {
+            background: #7d3c98;
+        }
+        
         /* Table Styles */
         table {
             width: 100%;
@@ -538,6 +548,10 @@
             background: var(--simulation-color);
         }
         
+        .badge-admin {
+            background: var(--admin-color);
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
             .tabs {
@@ -593,6 +607,68 @@
             color: var(--secondary-color);
         }
         
+        /* Admin Panel */
+        .admin-panel {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+            border-top: 4px solid var(--admin-color);
+        }
+        
+        .data-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .data-section:last-child {
+            border-bottom: none;
+        }
+        
+        .data-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .json-viewer {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            font-family: monospace;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-bottom: 10px;
+        }
+        
+        .admin-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        /* File Input */
+        .file-input-container {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        
+        .file-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
         /* Progress bar */
         .progress-container {
             height: 10px;
@@ -609,37 +685,30 @@
             transition: width 0.5s ease;
         }
         
-        /* Performance indicator */
-        .performance-indicator {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .performance-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--success-color);
-        }
-        
         /* Custom scrollbar */
-        .event-log::-webkit-scrollbar {
+        .event-log::-webkit-scrollbar,
+        .json-viewer::-webkit-scrollbar {
             width: 8px;
         }
         
-        .event-log::-webkit-scrollbar-track {
+        .event-log::-webkit-scrollbar-track,
+        .json-viewer::-webkit-scrollbar-track {
             background: #f1f1f1;
         }
         
-        .event-log::-webkit-scrollbar-thumb {
+        .event-log::-webkit-scrollbar-thumb,
+        .json-viewer::-webkit-scrollbar-thumb {
             background: #c5c5c5;
             border-radius: 4px;
         }
         
-        .event-log::-webkit-scrollbar-thumb:hover {
+        .event-log::-webkit-scrollbar-thumb:hover,
+        .json-viewer::-webkit-scrollbar-thumb:hover {
             background: #a8a8a8;
+        }
+        
+        .json-viewer::-webkit-scrollbar-thumb {
+            background: #7f8c8d;
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -647,10 +716,10 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1><i class="fas fa-chart-line icon"></i>Gestion Bancaire Professionnelle</h1>
+            <h1><i class="fas fa-chart-line icon"></i>Gestion Bancaire Pro</h1>
             <div>
-                <button id="add-income" class="success"><i class="fas fa-plus-circle icon"></i>Nouvelle Transaction</button>
-                <button id="settings-btn" class="offshore"><i class="fas fa-cog icon"></i>Paramètres</button>
+                <button id="add-income" class="success"><i class="fas fa-plus-circle icon"></i>Transaction</button>
+                <button id="admin-btn" class="admin"><i class="fas fa-cog icon"></i>Admin</button>
             </div>
         </div>
         
@@ -663,7 +732,6 @@
                     <button id="pause-simulation" class="warning" disabled><i class="fas fa-pause icon"></i>Pause</button>
                     <button id="stop-simulation" class="delete" disabled><i class="fas fa-stop icon"></i>Arrêter</button>
                     <button id="next-month" class="simulation"><i class="fas fa-forward icon"></i>Mois Suivant</button>
-                    <button id="speed-up" class="business"><i class="fas fa-tachometer-alt icon"></i>Accélérer</button>
                 </div>
             </div>
             
@@ -760,6 +828,7 @@
             <div class="tab" data-tab="transfers">Virements</div>
             <div class="tab" data-tab="transactions">Transactions</div>
             <div class="tab" data-tab="business">Entreprise</div>
+            <div class="tab" data-tab="admin"><i class="fas fa-cog"></i> Administration</div>
         </div>
         
         <!-- Section Banques -->
@@ -857,7 +926,6 @@
                 <button id="hire-employee" class="business"><i class="fas fa-user-plus icon"></i>Embaucher</button>
                 <button id="buy-equipment" class="business"><i class="fas fa-tools icon"></i>Acheter du Matériel</button>
                 <button id="launch-campaign" class="business"><i class="fas fa-bullhorn icon"></i>Lancer une Campagne</button>
-                <button id="business-settings" class="offshore"><i class="fas fa-cog icon"></i>Paramètres</button>
             </div>
             
             <div class="business-stats">
@@ -913,6 +981,99 @@
             </table>
         </div>
         
+        <!-- Section Admin -->
+        <div id="admin" class="tab-content">
+            <h2><i class="fas fa-cog icon"></i> Administration des Données</h2>
+            
+            <div class="admin-panel">
+                <h3><i class="fas fa-database icon"></i> Gestion des Données</h3>
+                
+                <div class="admin-buttons">
+                    <button id="export-all" class="admin"><i class="fas fa-file-export"></i> Exporter toutes les données</button>
+                    <button id="import-all" class="admin"><i class="fas fa-file-import"></i> Importer des données</button>
+                    <button id="reset-data" class="delete"><i class="fas fa-trash"></i> Réinitialiser toutes les données</button>
+                </div>
+                
+                <div class="progress-container" style="margin-top: 15px;">
+                    <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="admin-panel">
+                <h3><i class="fas fa-file-code icon"></i> Fichiers JSON</h3>
+                
+                <div class="data-section">
+                    <div class="data-header">
+                        <h4><i class="fas fa-university"></i> Banques</h4>
+                        <div>
+                            <button class="export-btn" data-type="banks"><i class="fas fa-download"></i> Exporter</button>
+                            <div class="file-input-container">
+                                <button class="import-btn"><i class="fas fa-upload"></i> Importer</button>
+                                <input type="file" class="file-input" data-type="banks" accept=".json">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="json-viewer" id="banks-json">Aucune donnée</div>
+                </div>
+                
+                <div class="data-section">
+                    <div class="data-header">
+                        <h4><i class="fas fa-wallet"></i> Comptes</h4>
+                        <div>
+                            <button class="export-btn" data-type="accounts"><i class="fas fa-download"></i> Exporter</button>
+                            <div class="file-input-container">
+                                <button class="import-btn"><i class="fas fa-upload"></i> Importer</button>
+                                <input type="file" class="file-input" data-type="accounts" accept=".json">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="json-viewer" id="accounts-json">Aucune donnée</div>
+                </div>
+                
+                <div class="data-section">
+                    <div class="data-header">
+                        <h4><i class="fas fa-exchange-alt"></i> Virements</h4>
+                        <div>
+                            <button class="export-btn" data-type="transfers"><i class="fas fa-download"></i> Exporter</button>
+                            <div class="file-input-container">
+                                <button class="import-btn"><i class="fas fa-upload"></i> Importer</button>
+                                <input type="file" class="file-input" data-type="transfers" accept=".json">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="json-viewer" id="transfers-json">Aucune donnée</div>
+                </div>
+                
+                <div class="data-section">
+                    <div class="data-header">
+                        <h4><i class="fas fa-list-alt"></i> Transactions</h4>
+                        <div>
+                            <button class="export-btn" data-type="transactions"><i class="fas fa-download"></i> Exporter</button>
+                            <div class="file-input-container">
+                                <button class="import-btn"><i class="fas fa-upload"></i> Importer</button>
+                                <input type="file" class="file-input" data-type="transactions" accept=".json">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="json-viewer" id="transactions-json">Aucune donnée</div>
+                </div>
+                
+                <div class="data-section">
+                    <div class="data-header">
+                        <h4><i class="fas fa-chart-line"></i> Simulation</h4>
+                        <div>
+                            <button class="export-btn" data-type="simulation"><i class="fas fa-download"></i> Exporter</button>
+                            <div class="file-input-container">
+                                <button class="import-btn"><i class="fas fa-upload"></i> Importer</button>
+                                <input type="file" class="file-input" data-type="simulation" accept=".json">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="json-viewer" id="simulation-json">Aucune donnée</div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Modals -->
         <div id="modal" class="modal">
             <div class="modal-content">
@@ -927,6 +1088,470 @@
     
     <script>
         // Données de l'application
+        const app = {
+            // Données de base
+            banks: [],
+            accounts: [],
+            transfers: [],
+            transactions: [],
+            timers: {},
+            
+            // Données de simulation
+            simulation: {
+                running: false,
+                currentMonth: 1,
+                intervalId: null,
+                speed: 2000, // 2 secondes = 1 mois
+                
+                // Statistiques personnelles
+                personal: {
+                    salary: 2500,
+                    livingExpenses: 1800,
+                    randomEvents: true
+                },
+                
+                // Statistiques d'entreprise
+                business: {
+                    employees: [],
+                    equipment: [],
+                    campaigns: [],
+                    customers: 0,
+                    baseRevenue: 5000,
+                    performance: 1.0,
+                    marketingImpact: 1.0
+                },
+                
+                // Historique des événements
+                events: []
+            },
+            
+            // Types de comptes
+            accountTypes: {
+                personal: { name: "Personnel", color: "personal" },
+                business: { name: "Professionnel", color: "business" },
+                offshore: { name: "Offshore", color: "offshore" }
+            },
+            
+            // Catégories de transactions
+            transactionCategories: [
+                "Salaire", "Dividendes", "Vente", "Achat", 
+                "Loyer", "Fournisseur", "Impôt", "Autre",
+                "Simulation"
+            ],
+            
+            // Types d'employés
+            employeeTypes: [
+                { name: "Stagiaire", salary: 800, productivity: 0.5 },
+                { name: "Employé", salary: 2000, productivity: 1.0 },
+                { name: "Manager", salary: 3500, productivity: 1.5 },
+                { name: "Directeur", salary: 5000, productivity: 2.0 }
+            ],
+            
+            // Types d'équipement
+            equipmentTypes: [
+                { name: "Bureau", cost: 500, lifespan: 60, depreciation: 8.33 },
+                { name: "Ordinateur", cost: 1200, lifespan: 36, depreciation: 33.33 },
+                { name: "Véhicule", cost: 25000, lifespan: 120, depreciation: 208.33 },
+                { name: "Machinerie", cost: 50000, lifespan: 120, depreciation: 416.67 }
+            ],
+            
+            // Types de campagnes
+            campaignTypes: [
+                { name: "Réseaux sociaux", cost: 1000, duration: 3, impact: 0.2 },
+                { name: "Publicité locale", cost: 3000, duration: 6, impact: 0.3 },
+                { name: "Publicité nationale", cost: 10000, duration: 12, impact: 0.5 }
+            ],
+            
+            // Initialisation
+            init: function() {
+                // Charger les données
+                this.loadData();
+                
+                // Gestion des onglets
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.addEventListener('click', function() {
+                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                        
+                        this.classList.add('active');
+                        document.getElementById(this.dataset.tab).classList.add('active');
+                        
+                        // Mettre à jour la vue JSON si on est dans l'admin
+                        if (this.dataset.tab === 'admin') {
+                            app.updateJsonViewers();
+                        }
+                    });
+                });
+                
+                // Filtres des comptes
+                document.querySelectorAll('#accounts .filter-buttons button').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        document.querySelectorAll('#accounts .filter-buttons button').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        app.filterAccounts(this.dataset.filter);
+                    });
+                });
+                
+                // Filtres des transactions
+                document.querySelectorAll('#transactions .filter-buttons button').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        document.querySelectorAll('#transactions .filter-buttons button').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        app.filterTransactions(this.dataset.filter);
+                    });
+                });
+                
+                // Boutons d'ajout
+                document.getElementById('add-bank').addEventListener('click', () => this.showBankForm());
+                document.getElementById('add-personal-account').addEventListener('click', () => this.showAccountForm('personal'));
+                document.getElementById('add-business-account').addEventListener('click', () => this.showAccountForm('business'));
+                document.getElementById('add-income').addEventListener('click', () => this.showTransactionForm());
+                document.getElementById('add-transfer').addEventListener('click', () => this.showTransferForm());
+                document.getElementById('add-offshore-transfer').addEventListener('click', () => this.showTransferForm('offshore'));
+                
+                // Boutons du modal
+                document.getElementById('cancel').addEventListener('click', () => this.closeModal());
+                document.getElementById('save').addEventListener('click', () => this.saveData());
+                
+                // Boutons de simulation
+                document.getElementById('start-simulation').addEventListener('click', () => this.startSimulation());
+                document.getElementById('pause-simulation').addEventListener('click', () => this.pauseSimulation());
+                document.getElementById('stop-simulation').addEventListener('click', () => this.stopSimulation());
+                document.getElementById('next-month').addEventListener('click', () => this.simulateMonth());
+                
+                // Boutons d'entreprise
+                document.getElementById('hire-employee').addEventListener('click', () => this.showHireEmployeeForm());
+                document.getElementById('buy-equipment').addEventListener('click', () => this.showBuyEquipmentForm());
+                document.getElementById('launch-campaign').addEventListener('click', () => this.showLaunchCampaignForm());
+                
+                // Boutons d'administration
+                document.getElementById('export-all').addEventListener('click', () => this.exportAllData());
+                document.getElementById('import-all').addEventListener('click', () => document.getElementById('import-all-file').click());
+                document.getElementById('reset-data').addEventListener('click', () => this.resetAllData());
+                
+                // Écouteurs pour les boutons d'export individuels
+                document.querySelectorAll('.export-btn').forEach(btn => {
+                    btn.addEventListener('click', () => this.exportData(btn.dataset.type));
+                });
+                
+                // Écouteurs pour les imports de fichiers
+                document.querySelectorAll('.file-input').forEach(input => {
+                    input.addEventListener('change', (e) => this.importData(e.target.dataset.type, e.target.files[0]));
+                });
+                
+                // Créer un input caché pour l'import global
+                const importAllInput = document.createElement('input');
+                importAllInput.type = 'file';
+                importAllInput.id = 'import-all-file';
+                importAllInput.accept = '.json';
+                importAllInput.style.display = 'none';
+                importAllInput.addEventListener('change', (e) => this.importAllData(e.target.files[0]));
+                document.body.appendChild(importAllInput);
+                
+                // Démarrer les virements programmés
+                this.startScheduledTransfers();
+                
+                // Mettre à jour les dashboards
+                this.updateDashboards();
+                
+                // Mettre à jour l'affichage de la simulation
+                this.updateSimulationDisplay();
+            },
+            
+            // Charger les données depuis le localStorage
+            loadData: function() {
+                this.banks = JSON.parse(localStorage.getItem('banks')) || [];
+                this.accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+                this.transfers = JSON.parse(localStorage.getItem('transfers')) || [];
+                this.transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+                
+                // Charger les données de simulation
+                const savedSimulation = localStorage.getItem('simulation');
+                if (savedSimulation) {
+                    this.simulation = {
+                        ...this.simulation,
+                        ...JSON.parse(savedSimulation),
+                        running: false,
+                        intervalId: null
+                    };
+                }
+            },
+            
+            // Sauvegarder les données dans le localStorage
+            saveData: function() {
+                localStorage.setItem('banks', JSON.stringify(this.banks));
+                localStorage.setItem('accounts', JSON.stringify(this.accounts));
+                localStorage.setItem('transfers', JSON.stringify(this.transfers));
+                localStorage.setItem('transactions', JSON.stringify(this.transactions));
+                localStorage.setItem('simulation', JSON.stringify(this.simulation));
+            },
+            
+            // Mettre à jour les visualiseurs JSON
+            updateJsonViewers: function() {
+                document.getElementById('banks-json').textContent = JSON.stringify(this.banks, null, 2) || 'Aucune donnée';
+                document.getElementById('accounts-json').textContent = JSON.stringify(this.accounts, null, 2) || 'Aucune donnée';
+                document.getElementById('transfers-json').textContent = JSON.stringify(this.transfers, null, 2) || 'Aucune donnée';
+                document.getElementById('transactions-json').textContent = JSON.stringify(this.transactions, null, 2) || 'Aucune donnée';
+                document.getElementById('simulation-json').textContent = JSON.stringify(this.simulation, null, 2) || 'Aucune donnée';
+            },
+            
+            // Exporter des données spécifiques
+            exportData: function(type) {
+                let data, filename;
+                
+                switch(type) {
+                    case 'banks':
+                        data = this.banks;
+                        filename = 'banques.json';
+                        break;
+                    case 'accounts':
+                        data = this.accounts;
+                        filename = 'comptes.json';
+                        break;
+                    case 'transfers':
+                        data = this.transfers;
+                        filename = 'virements.json';
+                        break;
+                    case 'transactions':
+                        data = this.transactions;
+                        filename = 'transactions.json';
+                        break;
+                    case 'simulation':
+                        data = this.simulation;
+                        filename = 'simulation.json';
+                        break;
+                    default:
+                        return;
+                }
+                
+                const json = JSON.stringify(data, null, 2);
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            },
+            
+            // Exporter toutes les données
+            exportAllData: function() {
+                const allData = {
+                    banks: this.banks,
+                    accounts: this.accounts,
+                    transfers: this.transfers,
+                    transactions: this.transactions,
+                    simulation: this.simulation
+                };
+                
+                const json = JSON.stringify(allData, null, 2);
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'gestion_bancaire_data.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            },
+            
+            // Importer des données spécifiques
+            importData: function(type, file) {
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        
+                        switch(type) {
+                            case 'banks':
+                                this.banks = data;
+                                break;
+                            case 'accounts':
+                                this.accounts = data;
+                                break;
+                            case 'transfers':
+                                this.transfers = data;
+                                // Redémarrer les virements
+                                this.stopAllTransfers();
+                                this.startScheduledTransfers();
+                                break;
+                            case 'transactions':
+                                this.transactions = data;
+                                break;
+                            case 'simulation':
+                                this.simulation = {
+                                    ...this.simulation,
+                                    ...data,
+                                    running: false,
+                                    intervalId: null
+                                };
+                                break;
+                        }
+                        
+                        // Sauvegarder et mettre à jour
+                        this.saveData();
+                        this.loadData();
+                        this.loadBanks();
+                        this.loadAccounts();
+                        this.loadTransfers();
+                        this.loadTransactions();
+                        this.updateDashboards();
+                        this.updateSimulationDisplay();
+                        this.updateJsonViewers();
+                        
+                        this.logEvent(`Données ${type} importées avec succès`);
+                        this.showProgress(100, 'success');
+                    } catch (error) {
+                        console.error('Erreur lors de l\'import des données:', error);
+                        this.logEvent(`Erreur lors de l'import des données ${type}: format invalide`);
+                        this.showProgress(0, 'error');
+                    }
+                };
+                
+                reader.readAsText(file);
+                this.showProgress(50, 'loading');
+            },
+            
+            // Importer toutes les données
+            importAllData: function(file) {
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const allData = JSON.parse(e.target.result);
+                        
+                        this.banks = allData.banks || [];
+                        this.accounts = allData.accounts || [];
+                        this.transfers = allData.transfers || [];
+                        this.transactions = allData.transactions || [];
+                        this.simulation = {
+                            ...this.simulation,
+                            ...(allData.simulation || {}),
+                            running: false,
+                            intervalId: null
+                        };
+                        
+                        // Sauvegarder et mettre à jour
+                        this.saveData();
+                        this.loadData();
+                        this.loadBanks();
+                        this.loadAccounts();
+                        this.loadTransfers();
+                        this.loadTransactions();
+                        this.updateDashboards();
+                        this.updateSimulationDisplay();
+                        this.updateJsonViewers();
+                        
+                        // Redémarrer les virements
+                        this.stopAllTransfers();
+                        this.startScheduledTransfers();
+                        
+                        this.logEvent('Toutes les données importées avec succès');
+                        this.showProgress(100, 'success');
+                    } catch (error) {
+                        console.error('Erreur lors de l\'import des données:', error);
+                        this.logEvent('Erreur lors de l\'import des données: format invalide');
+                        this.showProgress(0, 'error');
+                    }
+                };
+                
+                reader.readAsText(file);
+                this.showProgress(50, 'loading');
+            },
+            
+            // Réinitialiser toutes les données
+            resetAllData: function() {
+                if (confirm('Êtes-vous sûr de vouloir réinitialiser toutes les données ? Cette action est irréversible.')) {
+                    this.banks = [];
+                    this.accounts = [];
+                    this.transfers = [];
+                    this.transactions = [];
+                    
+                    // Réinitialiser la simulation
+                    this.simulation = {
+                        running: false,
+                        currentMonth: 1,
+                        intervalId: null,
+                        speed: 2000,
+                        personal: {
+                            salary: 2500,
+                            livingExpenses: 1800,
+                            randomEvents: true
+                        },
+                        business: {
+                            employees: [],
+                            equipment: [],
+                            campaigns: [],
+                            customers: 0,
+                            baseRevenue: 5000,
+                            performance: 1.0,
+                            marketingImpact: 1.0
+                        },
+                        events: []
+                    };
+                    
+                    // Arrêter la simulation
+                    this.stopSimulation();
+                    
+                    // Arrêter tous les virements
+                    this.stopAllTransfers();
+                    
+                    // Sauvegarder
+                    this.saveData();
+                    
+                    // Recharger l'interface
+                    this.loadBanks();
+                    this.loadAccounts();
+                    this.loadTransfers();
+                    this.loadTransactions();
+                    this.updateDashboards();
+                    this.updateSimulationDisplay();
+                    this.updateJsonViewers();
+                    
+                    // Vider le journal
+                    document.getElementById('event-log').innerHTML = `
+                        <div class="event-entry">
+                            <div class="event-date">[Système]</div>
+                            <div class="event-message">Données réinitialisées. Prêt à démarrer une nouvelle simulation.</div>
+                        </div>
+                    `;
+                    
+                    this.logEvent('Toutes les données ont été réinitialisées');
+                }
+            },
+            
+            // Afficher la progression
+            showProgress: function(percent, status) {
+                const progressBar = document.getElementById('progress-bar');
+                progressBar.style.width = `${percent}%`;
+                
+                switch(status) {
+                    case 'success':
+                        progressBar.style.background = 'var(--success-color)';
+                        break;
+                    case 'error':
+                        progressBar.style.background = 'var(--danger-color)';
+                        break;
+                    case 'loading':
+                        progressBar.style.background = 'var(--primary-color)';
+                        break;
+                }
+                
+                if (percent === 100) {
+                    setTimeout(() => {
+                        progressBar.style.width = '0%';
+                    }, 2000);
+                }
+            },
+            // Données de l'application
         const app = {
             // Données de base
             banks: JSON.parse(localStorage.getItem('banks')) || [],
