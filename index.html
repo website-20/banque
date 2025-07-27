@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulation Économique - Gestion Bancaire Pro</title>
+    <title>Simulation Économique Pro - Gestion Bancaire Complète</title>
     <style>
         :root {
             --primary-color: #3498db;
@@ -52,10 +52,9 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
-            padding-bottom: 15px;
+            padding: 20px;
             border-bottom: 1px solid #ddd;
             background: white;
-            padding: 20px;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
         }
@@ -648,9 +647,9 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1><i class="fas fa-chart-line icon"></i>Simulation Économique Pro</h1>
+            <h1><i class="fas fa-chart-line icon"></i>Gestion Bancaire Professionnelle</h1>
             <div>
-                <button id="add-income" class="success"><i class="fas fa-plus-circle icon"></i>Nouvelle Entrée</button>
+                <button id="add-income" class="success"><i class="fas fa-plus-circle icon"></i>Nouvelle Transaction</button>
                 <button id="settings-btn" class="offshore"><i class="fas fa-cog icon"></i>Paramètres</button>
             </div>
         </div>
@@ -658,7 +657,7 @@
         <!-- Simulation Panel -->
         <div class="simulation-panel">
             <div class="simulation-header">
-                <h2 class="simulation-title"><i class="fas fa-business-time"></i> Simulation de Vie Économique</h2>
+                <h2 class="simulation-title"><i class="fas fa-business-time"></i> Simulation Économique</h2>
                 <div class="simulation-controls">
                     <button id="start-simulation" class="simulation"><i class="fas fa-play icon"></i>Démarrer</button>
                     <button id="pause-simulation" class="warning" disabled><i class="fas fa-pause icon"></i>Pause</button>
@@ -674,23 +673,20 @@
                     <div class="value" id="current-month">Mois 1</div>
                 </div>
                 <div class="simulation-stat">
-                    <h4>Revenus Mensuels</h4>
-                    <div class="value positive" id="sim-income">0 €</div>
+                    <h4>Revenus Personnels</h4>
+                    <div class="value positive" id="personal-income">0 €</div>
                 </div>
                 <div class="simulation-stat">
-                    <h4>Dépenses Mensuelles</h4>
-                    <div class="value negative" id="sim-expenses">0 €</div>
+                    <h4>Dépenses Personnelles</h4>
+                    <div class="value negative" id="personal-expenses">0 €</div>
                 </div>
                 <div class="simulation-stat">
-                    <h4>Économies</h4>
-                    <div class="value positive" id="sim-savings">0 €</div>
+                    <h4>Revenus Professionnels</h4>
+                    <div class="value positive" id="business-income">0 €</div>
                 </div>
                 <div class="simulation-stat">
-                    <h4>Performance Entreprise</h4>
-                    <div class="value" id="business-performance-value">100%</div>
-                    <div class="progress-container">
-                        <div class="progress-bar" id="performance-bar" style="width: 100%"></div>
-                    </div>
+                    <h4>Dépenses Professionnelles</h4>
+                    <div class="value negative" id="business-expenses">0 €</div>
                 </div>
             </div>
             
@@ -752,7 +748,7 @@
                     </div>
                     <div class="stat-card">
                         <h4>Dépenses Opérationnelles</h4>
-                        <div class="amount negative" id="business-expenses">0.00 €</div>
+                        <div class="amount negative" id="business-operational-expenses">0.00 €</div>
                     </div>
                 </div>
             </div>
@@ -836,7 +832,7 @@
                 <button data-filter="income">Entrées</button>
                 <button data-filter="expense">Dépenses</button>
                 <button data-filter="transfer">Virements</button>
-                <button data-filter="simulation">Simulation</button>
+                <button data-filter="business">Professionnelles</button>
             </div>
             <table id="transactions-table">
                 <thead>
@@ -844,6 +840,7 @@
                         <th>Date</th>
                         <th>Description</th>
                         <th>Compte</th>
+                        <th>Banque</th>
                         <th>Montant</th>
                         <th>Catégorie</th>
                         <th>Actions</th>
@@ -907,6 +904,7 @@
                     <tr>
                         <th>Date</th>
                         <th>Action</th>
+                        <th>Compte</th>
                         <th>Coût</th>
                         <th>Impact</th>
                     </tr>
@@ -1038,7 +1036,7 @@
                 document.getElementById('add-bank').addEventListener('click', () => this.showBankForm());
                 document.getElementById('add-personal-account').addEventListener('click', () => this.showAccountForm('personal'));
                 document.getElementById('add-business-account').addEventListener('click', () => this.showAccountForm('business'));
-                document.getElementById('add-income').addEventListener('click', () => this.showTransactionForm('income'));
+                document.getElementById('add-income').addEventListener('click', () => this.showTransactionForm());
                 document.getElementById('add-transfer').addEventListener('click', () => this.showTransferForm());
                 document.getElementById('add-offshore-transfer').addEventListener('click', () => this.showTransferForm('offshore'));
                 
@@ -1348,20 +1346,27 @@
                     .filter(t => t.type === 'expense')
                     .reduce((sum, t) => sum + t.amount, 0);
                 
-                document.getElementById('sim-income').textContent = personalIncome.toFixed(2) + ' €';
-                document.getElementById('sim-expenses').textContent = personalExpenses.toFixed(2) + ' €';
+                document.getElementById('personal-income').textContent = personalIncome.toFixed(2) + ' €';
+                document.getElementById('personal-expenses').textContent = personalExpenses.toFixed(2) + ' €';
                 
-                // Calculer les économies
-                const personalAccounts = this.accounts.filter(a => a.type === 'personal');
-                const savings = personalAccounts.reduce((sum, a) => sum + a.balance, 0);
-                document.getElementById('sim-savings').textContent = savings.toFixed(2) + ' €';
+                // Calculer les revenus/dépenses professionnels
+                const businessTransactions = this.transactions
+                    .filter(t => {
+                        const account = this.accounts.find(a => a.id === t.accountId);
+                        return account && (account.type === 'business' || account.type === 'offshore') && 
+                               t.simulation && t.date >= Date.now() - 30 * 24 * 60 * 60 * 1000;
+                    });
                 
-                // Mettre à jour la performance d'entreprise
-                const performance = this.simulation.business.performance;
-                document.getElementById('business-performance-value').textContent = 
-                    Math.round(performance * 100) + '%';
-                document.getElementById('performance-bar').style.width = 
-                    Math.min(100, Math.max(0, performance * 100)) + '%';
+                const businessIncome = businessTransactions
+                    .filter(t => t.type === 'income')
+                    .reduce((sum, t) => sum + t.amount, 0);
+                
+                const businessExpenses = businessTransactions
+                    .filter(t => t.type === 'expense')
+                    .reduce((sum, t) => sum + t.amount, 0);
+                
+                document.getElementById('business-income').textContent = businessIncome.toFixed(2) + ' €';
+                document.getElementById('business-expenses').textContent = businessExpenses.toFixed(2) + ' €';
             },
             
             updateSimulationDisplay: function() {
@@ -1468,6 +1473,19 @@
                         <label for="employee-name">Nom (optionnel)</label>
                         <input type="text" id="employee-name" placeholder="Nom de l'employé">
                     </div>
+                    <div class="form-group">
+                        <label for="business-account">Compte professionnel</label>
+                        <select id="business-account" required>
+                            <option value="">Sélectionnez un compte</option>
+                            ${this.accounts
+                                .filter(a => a.type === 'business')
+                                .map(account => 
+                                    `<option value="${account.id}">
+                                        ${account.name} (${this.getBankName(account.bankId)}) - ${account.balance.toFixed(2)}€
+                                    </option>`
+                                ).join('')}
+                        </select>
+                    </div>
                 `;
                 this.openModal('hire-employee', false);
             },
@@ -1486,6 +1504,19 @@
                     <div class="form-group">
                         <label for="equipment-quantity">Quantité</label>
                         <input type="number" id="equipment-quantity" value="1" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="business-account">Compte professionnel</label>
+                        <select id="business-account" required>
+                            <option value="">Sélectionnez un compte</option>
+                            ${this.accounts
+                                .filter(a => a.type === 'business')
+                                .map(account => 
+                                    `<option value="${account.id}">
+                                        ${account.name} (${this.getBankName(account.bankId)}) - ${account.balance.toFixed(2)}€
+                                    </option>`
+                                ).join('')}
+                        </select>
                     </div>
                 `;
                 this.openModal('buy-equipment', false);
@@ -1506,6 +1537,19 @@
                         <label for="campaign-name">Nom (optionnel)</label>
                         <input type="text" id="campaign-name" placeholder="Nom de la campagne">
                     </div>
+                    <div class="form-group">
+                        <label for="business-account">Compte professionnel</label>
+                        <select id="business-account" required>
+                            <option value="">Sélectionnez un compte</option>
+                            ${this.accounts
+                                .filter(a => a.type === 'business')
+                                .map(account => 
+                                    `<option value="${account.id}">
+                                        ${account.name} (${this.getBankName(account.bankId)}) - ${account.balance.toFixed(2)}€
+                                    </option>`
+                                ).join('')}
+                        </select>
+                    </div>
                 `;
                 this.openModal('launch-campaign', false);
             },
@@ -1514,6 +1558,7 @@
                 const typeIndex = parseInt(document.getElementById('employee-type').value);
                 const name = document.getElementById('employee-name').value || this.employeeTypes[typeIndex].name;
                 const employeeType = this.employeeTypes[typeIndex];
+                const accountId = document.getElementById('business-account').value;
                 
                 const newEmployee = {
                     id: Date.now().toString(),
@@ -1550,21 +1595,17 @@
                 const quantity = parseInt(document.getElementById('equipment-quantity').value);
                 const equipmentType = this.equipmentTypes[typeIndex];
                 const totalCost = equipmentType.cost * quantity;
+                const accountId = document.getElementById('business-account').value;
                 
                 // Déduire le coût du compte professionnel
-                const businessAccount = this.accounts.find(a => a.type === 'business') || 
-                                      (this.accounts.length > 0 ? this.accounts[0] : null);
-                
-                if (businessAccount) {
-                    this.addTransaction({
-                        accountId: businessAccount.id,
-                        amount: totalCost,
-                        type: 'expense',
-                        category: 'Matériel',
-                        description: `Achat de ${quantity} ${equipmentType.name}`,
-                        simulation: false
-                    });
-                }
+                this.addTransaction({
+                    accountId: accountId,
+                    amount: totalCost,
+                    type: 'expense',
+                    category: 'Matériel',
+                    description: `Achat de ${quantity} ${equipmentType.name}`,
+                    simulation: false
+                });
                 
                 for (let i = 0; i < quantity; i++) {
                     const newEquipment = {
@@ -1603,6 +1644,7 @@
                 const typeIndex = parseInt(document.getElementById('campaign-type').value);
                 const name = document.getElementById('campaign-name').value || this.campaignTypes[typeIndex].name;
                 const campaignType = this.campaignTypes[typeIndex];
+                const accountId = document.getElementById('business-account').value;
                 
                 const newCampaign = {
                     id: Date.now().toString(),
@@ -1617,20 +1659,15 @@
                 
                 this.simulation.business.campaigns.push(newCampaign);
                 
-                // Trouver un compte professionnel pour payer
-                const businessAccount = this.accounts.find(a => a.type === 'business') || 
-                                      (this.accounts.length > 0 ? this.accounts[0] : null);
-                
-                if (businessAccount) {
-                    this.addTransaction({
-                        accountId: businessAccount.id,
-                        amount: campaignType.cost,
-                        type: 'expense',
-                        category: 'Marketing',
-                        description: `Campagne: ${name}`,
-                        simulation: true
-                    });
-                }
+                // Payer la campagne
+                this.addTransaction({
+                    accountId: accountId,
+                    amount: campaignType.cost,
+                    type: 'expense',
+                    category: 'Marketing',
+                    description: `Campagne: ${name}`,
+                    simulation: true
+                });
                 
                 this.logEvent(`Campagne lancée: ${name}`);
                 this.updateSimulationDisplay();
@@ -1659,6 +1696,7 @@
                     tr.innerHTML = `
                         <td>${new Date(emp.hireDate).toLocaleDateString()}</td>
                         <td>Embauche: ${emp.name} (${this.employeeTypes[emp.type].name})</td>
+                        <td>Compte professionnel</td>
                         <td>${this.employeeTypes[emp.type].salary.toFixed(2)} €/mois</td>
                         <td>+${(this.employeeTypes[emp.type].productivity * 100).toFixed(0)}% prod.</td>
                     `;
@@ -1675,6 +1713,7 @@
                     tr.innerHTML = `
                         <td>${new Date(eq.purchaseDate).toLocaleDateString()}</td>
                         <td>Achat: ${eq.name}</td>
+                        <td>Compte professionnel</td>
                         <td>${eq.cost.toFixed(2)} €</td>
                         <td>${eq.depreciation.toFixed(2)} €/mois</td>
                     `;
@@ -1691,6 +1730,7 @@
                     tr.innerHTML = `
                         <td>${new Date(camp.startDate).toLocaleDateString()}</td>
                         <td>Campagne: ${camp.name}</td>
+                        <td>Compte professionnel</td>
                         <td>${camp.cost.toFixed(2)} €</td>
                         <td>+${(camp.impact * 100).toFixed(0)}% impact</td>
                     `;
@@ -1744,7 +1784,7 @@
                     .reduce((sum, t) => sum + t.amount, 0);
                 
                 document.getElementById('business-revenue').textContent = businessRevenue.toFixed(2) + ' €';
-                document.getElementById('business-expenses').textContent = businessExpenses.toFixed(2) + ' €';
+                document.getElementById('business-operational-expenses').textContent = businessExpenses.toFixed(2) + ' €';
             },
             
             // Charger toutes les données
@@ -1835,12 +1875,12 @@
                 this.openModal('account', isEdit);
             },
             
-            showTransactionForm: function(type = 'income', transaction = null) {
+            showTransactionForm: function(transaction = null) {
                 const isEdit = transaction !== null;
-                const transactionType = isEdit ? transaction.type : type;
+                const transactionType = isEdit ? transaction.type : 'income';
                 
                 document.getElementById('modal-body').innerHTML = `
-                    <h3 class="modal-title"><i class="fas fa-money-bill-wave"></i> ${isEdit ? 'Modifier' : 'Nouvelle'} ${transactionType === 'income' ? 'Entrée' : 'Dépense'}</h3>
+                    <h3 class="modal-title"><i class="fas fa-money-bill-wave"></i> ${isEdit ? 'Modifier' : 'Nouvelle'} Transaction</h3>
                     <div class="form-group">
                         <label for="transaction-description">Description</label>
                         <input type="text" id="transaction-description" value="${isEdit ? transaction.description : ''}" required>
@@ -1852,7 +1892,7 @@
                                 <option value="">Sélectionnez un compte</option>
                                 ${this.accounts.map(account => 
                                     `<option value="${account.id}" ${isEdit && transaction.accountId === account.id ? 'selected' : ''}>
-                                        ${account.name} (${this.accountTypes[account.type].name}) - ${account.balance.toFixed(2)}€
+                                        ${account.name} (${this.accountTypes[account.type].name}) - ${this.getBankName(account.bankId)} - ${account.balance.toFixed(2)}€
                                     </option>`
                                 ).join('')}
                             </select>
@@ -1865,7 +1905,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="transaction-type">Type</label>
-                            <select id="transaction-type" ${isEdit ? '' : 'disabled'}>
+                            <select id="transaction-type">
                                 <option value="income" ${transactionType === 'income' ? 'selected' : ''}>Entrée</option>
                                 <option value="expense" ${transactionType === 'expense' ? 'selected' : ''}>Dépense</option>
                             </select>
@@ -1905,7 +1945,7 @@
                                 <option value="">Sélectionnez un compte</option>
                                 ${this.accounts.map(account => 
                                     `<option value="${account.id}" ${isEdit && transfer.fromAccountId === account.id ? 'selected' : ''}>
-                                        ${account.name} (${this.accountTypes[account.type].name}) - ${account.balance.toFixed(2)}€
+                                        ${account.name} (${this.accountTypes[account.type].name}) - ${this.getBankName(account.bankId)} - ${account.balance.toFixed(2)}€
                                     </option>`
                                 ).join('')}
                             </select>
@@ -1916,7 +1956,7 @@
                                 <option value="">Sélectionnez un compte</option>
                                 ${this.accounts.map(account => 
                                     `<option value="${account.id}" ${isEdit && transfer.toAccountId === account.id ? 'selected' : ''}>
-                                        ${account.name} (${this.accountTypes[account.type].name}) - ${account.balance.toFixed(2)}€
+                                        ${account.name} (${this.accountTypes[account.type].name}) - ${this.getBankName(account.bankId)} - ${account.balance.toFixed(2)}€
                                     </option>`
                                 ).join('')}
                             </select>
@@ -2224,7 +2264,7 @@
                 tbody.innerHTML = '';
                 
                 if (this.transactions.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Aucune transaction enregistrée</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">Aucune transaction enregistrée</td></tr>`;
                     return;
                 }
                 
@@ -2233,23 +2273,28 @@
                 
                 sortedTransactions.forEach(transaction => {
                     const account = this.accounts.find(a => a.id === transaction.accountId);
+                    const bank = account ? this.banks.find(b => b.id === account.bankId) : null;
                     const date = new Date(transaction.date);
                     
                     const tr = document.createElement('tr');
                     if (transaction.simulation) {
                         tr.classList.add('simulation-transaction');
                     }
+                    if (account && account.type === 'business') {
+                        tr.classList.add('business-transaction');
+                    }
                     
                     tr.innerHTML = `
                         <td>${date.toLocaleDateString()} ${date.toLocaleTimeString()}</td>
                         <td>${transaction.description}</td>
                         <td>${account ? account.name : 'Compte inconnu'}</td>
+                        <td>${bank ? bank.name : 'Banque inconnue'}</td>
                         <td class="${transaction.type === 'income' ? 'positive' : 'negative'}">
                             ${transaction.type === 'income' ? '+' : '-'}${transaction.amount.toFixed(2)} €
                         </td>
                         <td>${transaction.category}</td>
                         <td class="actions-cell">
-                            <button onclick="app.showTransactionForm(null, ${JSON.stringify(transaction)})"><i class="fas fa-edit icon"></i>Modifier</button>
+                            <button onclick="app.showTransactionForm(${JSON.stringify(transaction)})"><i class="fas fa-edit icon"></i>Modifier</button>
                             <button class="delete" onclick="app.deleteTransaction('${transaction.id}')"><i class="fas fa-trash icon"></i>Supprimer</button>
                         </td>
                     `;
@@ -2262,6 +2307,8 @@
                 rows.forEach((row, index) => {
                     if (filter === 'all') {
                         row.style.display = '';
+                    } else if (filter === 'business') {
+                        row.style.display = row.classList.contains('business-transaction') ? '' : 'none';
                     } else if (filter === 'simulation') {
                         row.style.display = row.classList.contains('simulation-transaction') ? '' : 'none';
                     } else {
