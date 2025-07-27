@@ -1790,4 +1790,52 @@
                     const tr = document.createElement('tr');
                     tr.className = `account-${account.type}`;
                     tr.innerHTML = `
-                        <td>${accoun
+                        <td>${account.name}</td>
+                        <td><span class="badge badge-${this.accountTypes[account.type].color}">${this.accountTypes[account.type].name}</span></td>
+                        <td>${bank ? bank.name : 'Inconnue'}</td>
+                        <td class="${account.balance >= 0 ? 'positive' : 'negative'}">${account.balance.toFixed(2)} €</td>
+                        <td class="actions-cell">
+                            <button onclick="app.showAccountForm(null, ${JSON.stringify(account)})"><i class="fas fa-edit icon"></i>Modifier</button>
+                            <button class="delete" onclick="app.deleteAccount('${account.id}')"><i class="fas fa-trash icon"></i>Supprimer</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            },
+            
+            filterAccounts: function(filter) {
+                const rows = document.querySelectorAll('#accounts-table tbody tr');
+                rows.forEach(row => {
+                    if (filter === 'all') {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = row.classList.contains(`account-${filter}`) ? '' : 'none';
+                    }
+                });
+            },
+            
+            loadTransfers: function() {
+                const tbody = document.querySelector('#transfers-table tbody');
+                tbody.innerHTML = '';
+                
+                if (this.transfers.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">Aucun virement programmé</td></tr>`;
+                    return;
+                }
+                
+                this.transfers.forEach(transfer => {
+                    const fromAccount = this.accounts.find(a => a.id === transfer.fromAccountId);
+                    const toAccount = this.accounts.find(a => a.id === transfer.toAccountId);
+                    const nextDate = new Date(transfer.nextExecution);
+                    
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${fromAccount ? fromAccount.name : 'Compte inconnu'}</td>
+                        <td>${toAccount ? toAccount.name : 'Compte inconnu'}</td>
+                        <td>${transfer.amount.toFixed(2)} €</td>
+                        <td><span class="badge ${transfer.transferType === 'offshore' ? 'badge-offshore' : ''}">${transfer.transferType === 'offshore' ? 'Offshore' : 'Normal'}</span></td>
+                        <td>${transfer.interval}</td>
+                        <td>${nextDate.toLocaleString()}</td>
+                        <td class="actions-cell">
+                            <button onclick="app.showTransferForm(null, ${JSON.stringify(transfer)})"><i class="fas fa-edit icon"></i>Modifier</button>
+                            <button class="delete" onclick="app.deleteTransfer('${transfer.id}')"><i class="fas fa-trash icon"></i>Supprim
