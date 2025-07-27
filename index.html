@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionnaire de Banques</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            padding: 20px;
+        }
+        
+        h1, h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #eee;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+        }
+        
+        .tab.active {
+            background: #2c3e50;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        button {
+            padding: 8px 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        
+        button:hover {
+            background: #2980b9;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background: #f2f2f2;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 500px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .actions button {
+            margin-left: 10px;
+        }
+        
+        .delete {
+            background: #e74c3c;
+        }
+        
+        .delete:hover {
+            background: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gestionnaire de Banques</h1>
+    
+    <div class="tabs">
+        <div class="tab active" data-tab="banks">Banques</div>
+        <div class="tab" data-tab="accounts">Comptes</div>
+        <div class="tab" data-tab="transfers">Virements</div>
+    </div>
+    
+    <!-- Section Banques -->
+    <div id="banks" class="tab-content active">
+        <h2>Gestion des Banques</h2>
+        <button id="add-bank">Ajouter une Banque</button>
+        <table id="banks-table">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Code</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    
+    <!-- Section Comptes -->
+    <div id="accounts" class="tab-content">
+        <h2>Gestion des Comptes</h2>
+        <button id="add-account">Ajouter un Compte</button>
+        <table id="accounts-table">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Banque</th>
+                    <th>Solde</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    
+    <!-- Section Virements -->
+    <div id="transfers" class="tab-content">
+        <h2>Gestion des Virements</h2>
+        <button id="add-transfer">Programmer un Virement</button>
+        <table id="transfers-table">
+            <thead>
+                <tr>
+                    <th>De</th>
+                    <th>Vers</th>
+                    <th>Montant</th>
+                    <th>Fréquence (s)</th>
+                    <th>Prochain</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div id="modal-body"></div>
+            <div class="actions">
+                <button id="cancel">Annuler</button>
+                <button id="save">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Données de l'application
+        let banks = JSON.parse(localStorage.getItem('banks')) || [];
+        let accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+        let transfers = JSON.parse(localStorage.getItem('transfers')) || [];
+        let timers = {};
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gestion des onglets
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    document.getElementById(this.dataset.tab).classList.add('active');
+                });
+            });
+            
+            // Boutons d'ajout
+            document.getElementById('add-bank').addEventListener('click', showBankForm);
+            document.getElementById('add-account').addEventListener('click', showAccountForm);
+            document.getElementById('add-transfer').addEventListener('click', showTransferForm);
+            
+            // Boutons du modal
+            document.getElementById('cancel').addEventListener('click', closeModal);
+            document.getElementById('save').addEventListener('click', saveData);
+            
+            // Charger les données
+            loadBanks();
+            loadAccounts();
+            loadTransfers();
+            
+            // Démarrer les virements programmés
+            startScheduledTransfers();
+        });
+        
+        // Fonctions pour afficher les formulaires
+        function showBankForm(bank = null) {
+            const isEdit = bank !== null;
+            document.getElementById('modal-body').innerHTML = `
+                <h3>${isEdit ? 'Modifier' : 'Ajouter'} une Banque</h3>
+                <div class="form-group">
+                    <label for="bank-name">Nom de la banque</label>
+                    <input type="text" id="bank-name" value="${isEdit ? bank.name : ''}">
+                </div>
+                <div class="form-group">
+                    <label for="bank-code">Code de la banque</label>
+                    <input type="text" id="bank-code" value="${isEdit ? bank.code : ''}">
+                </div>
+                ${isEdit ? `<input type="hidden" id="bank-id" value="${bank.id}">` : ''}
+            `;
+            openModal('bank', isEdit);
+        }
+        
+        function showAccountForm(account = null) {
+            const isEdit = account !== null;
+            document.getElementById('modal-body').innerHTML = `
+                <h3>${isEdit ? 'Modifier' : 'Ajouter'} un Compte</h3>
+                <div class="form-group">
+                    <label for="account-name">Nom du compte</label>
+                    <input type="text" id="account-name" value="${isEdit ? account.name : ''}">
+                </div>
+                <div class="form-group">
+                    <label for="account-bank">Banque</label>
+                    <select id="account-bank">
+                        ${banks.map(bank => `<option value="${bank.id}" ${isEdit && account.bankId === bank.id ? 'selected' : ''}>${bank.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="account-balance">Solde initial</label>
+                    <input type="number" id="account-balance" value="${isEdit ? account.balance : '0'}">
+                </div>
+                ${isEdit ? `<input type="hidden" id="account-id" value="${account.id}">` : ''}
+            `;
+            openModal('account', isEdit);
+        }
+        
+        function showTransferForm(transfer = null) {
+            const isEdit = transfer !== null;
+            document.getElementById('modal-body').innerHTML = `
+                <h3>${isEdit ? 'Modifier' : 'Programmer'} un Virement</h3>
+                <div class="form-group">
+                    <label for="transfer-from">Compte source</label>
+                    <select id="transfer-from">
+                        ${accounts.map(account => `<option value="${account.id}" ${isEdit && transfer.fromAccountId === account.id ? 'selected' : ''}>${account.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="transfer-to">Compte destination</label>
+                    <select id="transfer-to">
+                        ${accounts.map(account => `<option value="${account.id}" ${isEdit && transfer.toAccountId === account.id ? 'selected' : ''}>${account.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="transfer-amount">Montant</label>
+                    <input type="number" id="transfer-amount" value="${isEdit ? transfer.amount : ''}">
+                </div>
+                <div class="form-group">
+                    <label for="transfer-interval">Intervalle (en secondes)</label>
+                    <input type="number" id="transfer-interval" value="${isEdit ? transfer.interval : ''}">
+                </div>
+                ${isEdit ? `<input type="hidden" id="transfer-id" value="${transfer.id}">` : ''}
+            `;
+            openModal('transfer', isEdit);
+        }
+        
+        // Gestion du modal
+        function openModal(type, isEdit) {
+            document.getElementById('modal').style.display = 'flex';
+            document.getElementById('modal').dataset.type = type;
+            document.getElementById('modal').dataset.edit = isEdit;
+        }
+        
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+        
+        // Sauvegarde des données
+        function saveData() {
+            const modal = document.getElementById('modal');
+            const type = modal.dataset.type;
+            const isEdit = modal.dataset.edit === 'true';
+            
+            if (type === 'bank') {
+                const bank = {
+                    id: isEdit ? document.getElementById('bank-id').value : Date.now().toString(),
+                    name: document.getElementById('bank-name').value,
+                    code: document.getElementById('bank-code').value
+                };
+                
+                if (isEdit) {
+                    const index = banks.findIndex(b => b.id === bank.id);
+                    banks[index] = bank;
+                } else {
+                    banks.push(bank);
+                }
+                
+                localStorage.setItem('banks', JSON.stringify(banks));
+                loadBanks();
+            } 
+            else if (type === 'account') {
+                const account = {
+                    id: isEdit ? document.getElementById('account-id').value : Date.now().toString(),
+                    name: document.getElementById('account-name').value,
+                    bankId: document.getElementById('account-bank').value,
+                    balance: parseFloat(document.getElementById('account-balance').value)
+                };
+                
+                if (isEdit) {
+                    const index = accounts.findIndex(a => a.id === account.id);
+                    accounts[index] = account;
+                } else {
+                    accounts.push(account);
+                }
+                
+                localStorage.setItem('accounts', JSON.stringify(accounts));
+                loadAccounts();
+            }
+            else if (type === 'transfer') {
+                const transfer = {
+                    id: isEdit ? document.getElementById('transfer-id').value : Date.now().toString(),
+                    fromAccountId: document.getElementById('transfer-from').value,
+                    toAccountId: document.getElementById('transfer-to').value,
+                    amount: parseFloat(document.getElementById('transfer-amount').value),
+                    interval: parseInt(document.getElementById('transfer-interval').value),
+                    nextExecution: isEdit ? transfers.find(t => t.id === transfer.id).nextExecution : Date.now()
+                };
+                
+                if (isEdit) {
+                    const index = transfers.findIndex(t => t.id === transfer.id);
+                    transfers[index] = transfer;
+                    
+                    // Redémarrer le timer si existant
+                    if (timers[transfer.id]) {
+                        clearInterval(timers[transfer.id]);
+                    }
+                } else {
+                    transfers.push(transfer);
+                }
+                
+                // Programmer le virement
+                scheduleTransfer(transfer);
+                
+                localStorage.setItem('transfers', JSON.stringify(transfers));
+                loadTransfers();
+            }
+            
+            closeModal();
+        }
+        
+        // Chargement des données dans les tableaux
+        function loadBanks() {
+            const tbody = document.querySelector('#banks-table tbody');
+            tbody.innerHTML = '';
+            
+            banks.forEach(bank => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${bank.name}</td>
+                    <td>${bank.code}</td>
+                    <td>
+                        <button onclick="showBankForm(${JSON.stringify(bank)})">Modifier</button>
+                        <button class="delete" onclick="deleteBank('${bank.id}')">Supprimer</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        function loadAccounts() {
+            const tbody = document.querySelector('#accounts-table tbody');
+            tbody.innerHTML = '';
+            
+            accounts.forEach(account => {
+                const bank = banks.find(b => b.id === account.bankId);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${account.name}</td>
+                    <td>${bank ? bank.name : 'Inconnue'}</td>
+                    <td>${account.balance.toFixed(2)} €</td>
+                    <td>
+                        <button onclick="showAccountForm(${JSON.stringify(account)})">Modifier</button>
+                        <button class="delete" onclick="deleteAccount('${account.id}')">Supprimer</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        function loadTransfers() {
+            const tbody = document.querySelector('#transfers-table tbody');
+            tbody.innerHTML = '';
+            
+            transfers.forEach(transfer => {
+                const fromAccount = accounts.find(a => a.id === transfer.fromAccountId);
+                const toAccount = accounts.find(a => a.id === transfer.toAccountId);
+                const nextDate = new Date(transfer.nextExecution);
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${fromAccount ? fromAccount.name : 'Compte inconnu'}</td>
+                    <td>${toAccount ? toAccount.name : 'Compte inconnu'}</td>
+                    <td>${transfer.amount.toFixed(2)} €</td>
+                    <td>${transfer.interval}</td>
+                    <td>${nextDate.toLocaleString()}</td>
+                    <td>
+                        <button onclick="showTransferForm(${JSON.stringify(transfer)})">Modifier</button>
+                        <button class="delete" onclick="deleteTransfer('${transfer.id}')">Supprimer</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        // Suppression d'éléments
+        function deleteBank(id) {
+            if (confirm('Voulez-vous vraiment supprimer cette banque ?')) {
+                banks = banks.filter(bank => bank.id !== id);
+                localStorage.setItem('banks', JSON.stringify(banks));
+                loadBanks();
+                
+                // Supprimer aussi les comptes associés
+                accounts = accounts.filter(account => account.bankId !== id);
+                localStorage.setItem('accounts', JSON.stringify(accounts));
+                loadAccounts();
+            }
+        }
+        
+        function deleteAccount(id) {
+            if (confirm('Voulez-vous vraiment supprimer ce compte ?')) {
+                accounts = accounts.filter(account => account.id !== id);
+                localStorage.setItem('accounts', JSON.stringify(accounts));
+                loadAccounts();
+                
+                // Supprimer aussi les virements associés
+                transfers = transfers.filter(transfer => 
+                    transfer.fromAccountId !== id && transfer.toAccountId !== id
+                );
+                localStorage.setItem('transfers', JSON.stringify(transfers));
+                loadTransfers();
+            }
+        }
+        
+        function deleteTransfer(id) {
+            if (confirm('Voulez-vous vraiment supprimer ce virement programmé ?')) {
+                transfers = transfers.filter(transfer => transfer.id !== id);
+                localStorage.setItem('transfers', JSON.stringify(transfers));
+                
+                // Arrêter le timer si existant
+                if (timers[id]) {
+                    clearInterval(timers[id]);
+                    delete timers[id];
+                }
+                
+                loadTransfers();
+            }
+        }
+        
+        // Gestion des virements programmés
+        function startScheduledTransfers() {
+            transfers.forEach(transfer => {
+                scheduleTransfer(transfer);
+            });
+        }
+        
+        function scheduleTransfer(transfer) {
+            // Arrêter le timer existant si modification
+            if (timers[transfer.id]) {
+                clearInterval(timers[transfer.id]);
+            }
+            
+            // Programmer le virement
+            timers[transfer.id] = setInterval(() => {
+                executeTransfer(transfer.id);
+            }, transfer.interval * 1000);
+            
+            // Exécuter immédiatement si c'est un nouveau virement
+            if (!transfer.nextExecution || transfer.nextExecution <= Date.now()) {
+                executeTransfer(transfer.id);
+            }
+        }
+        
+        function executeTransfer(transferId) {
+            const transfer = transfers.find(t => t.id === transferId);
+            if (!transfer) return;
+            
+            const fromAccount = accounts.find(a => a.id === transfer.fromAccountId);
+            const toAccount = accounts.find(a => a.id === transfer.toAccountId);
+            
+            if (!fromAccount || !toAccount) {
+                alert('Un des comptes pour ce virement n\'existe plus !');
+                deleteTransfer(transfer.id);
+                return;
+            }
+            
+            if (fromAccount.balance < transfer.amount) {
+                alert(`Fonds insuffisants sur le compte ${fromAccount.name} pour le virement !`);
+                return;
+            }
+            
+            // Effectuer le virement
+            fromAccount.balance -= transfer.amount;
+            toAccount.balance += transfer.amount;
+            
+            // Mettre à jour la date de prochaine exécution
+            transfer.nextExecution = Date.now() + transfer.interval * 1000;
+            
+            // Sauvegarder les modifications
+            localStorage.setItem('accounts', JSON.stringify(accounts));
+            localStorage.setItem('transfers', JSON.stringify(transfers));
+            
+            // Recharger les affichages
+            loadAccounts();
+            loadTransfers();
+            
+            console.log(`Virement de ${transfer.amount}€ effectué de ${fromAccount.name} vers ${toAccount.name}`);
+        }
+    </script>
+</body>
+</html>
