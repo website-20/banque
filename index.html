@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulation Économique - Gestion Bancaire</title>
+    <title>Gestion Bancaire Pro - Solution Complète</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
             --primary-color: #3498db;
@@ -15,6 +16,7 @@
             --business-color: #1abc9c;
             --offshore-color: #34495e;
             --simulation-color: #e67e22;
+            --admin-color: #8e44ad;
             --light-color: #ecf0f1;
             --dark-color: #34495e;
             --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -33,6 +35,7 @@
             color: #333;
             line-height: 1.6;
             padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
         }
         
         .container {
@@ -51,8 +54,11 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
-            padding-bottom: 15px;
+            padding: 20px;
             border-bottom: 1px solid #ddd;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
         }
         
         /* Simulation Panel */
@@ -63,6 +69,7 @@
             box-shadow: var(--shadow);
             margin-bottom: 30px;
             border-top: 4px solid var(--simulation-color);
+            background: linear-gradient(to bottom, #ffffff, #f9f9f9);
         }
         
         .simulation-header {
@@ -87,6 +94,7 @@
         .simulation-controls {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
         
         .simulation-stats {
@@ -101,6 +109,13 @@
             padding: 15px;
             border-radius: var(--border-radius);
             text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .simulation-stat:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
         }
         
         .simulation-stat h4 {
@@ -126,6 +141,7 @@
             border-radius: var(--border-radius);
             margin-top: 10px;
             border: 1px solid #ddd;
+            font-size: 0.9rem;
         }
         
         .event-entry {
@@ -143,6 +159,7 @@
         .event-date {
             font-size: 0.8rem;
             color: #777;
+            font-weight: 500;
         }
         
         .event-message {
@@ -168,6 +185,11 @@
             padding: 20px;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+        
+        .dashboard:hover {
+            transform: translateY(-3px);
         }
         
         .dashboard.personal {
@@ -216,6 +238,12 @@
             padding: 15px;
             border-radius: var(--border-radius);
             text-align: center;
+            border: 1px solid #e0e0e0;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
         }
         
         .stat-card h4 {
@@ -243,6 +271,7 @@
             margin-bottom: 20px;
             border-bottom: 1px solid #ddd;
             gap: 5px;
+            flex-wrap: wrap;
         }
         
         .tab {
@@ -292,6 +321,9 @@
             margin-bottom: 15px;
             transition: all 0.3s ease;
             font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
         
         button:hover {
@@ -360,6 +392,14 @@
             background: #d35400;
         }
         
+        button.admin {
+            background: var(--admin-color);
+        }
+        
+        button.admin:hover {
+            background: #7d3c98;
+        }
+        
         /* Table Styles */
         table {
             width: 100%;
@@ -368,6 +408,7 @@
             box-shadow: var(--shadow);
             border-radius: var(--border-radius);
             overflow: hidden;
+            background: white;
         }
         
         th, td {
@@ -380,6 +421,8 @@
             background: var(--secondary-color);
             color: white;
             font-weight: 500;
+            position: sticky;
+            top: 0;
         }
         
         tr:hover {
@@ -432,6 +475,9 @@
             margin-bottom: 20px;
             color: var(--secondary-color);
             font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .form-group {
@@ -451,6 +497,7 @@
             border: 1px solid #ddd;
             border-radius: var(--border-radius);
             transition: border 0.3s ease;
+            font-size: 1rem;
         }
         
         input:focus, select:focus, textarea:focus {
@@ -501,6 +548,138 @@
             background: var(--simulation-color);
         }
         
+        .badge-admin {
+            background: var(--admin-color);
+        }
+        
+        /* Business Stats */
+        .business-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .business-stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            border: 1px solid #e0e0e0;
+            transition: transform 0.3s ease;
+        }
+        
+        .business-stat-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .business-stat-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--secondary-color);
+        }
+        
+        /* Admin Panel */
+        .admin-panel {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+            border-top: 4px solid var(--admin-color);
+        }
+        
+        .data-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .data-section:last-child {
+            border-bottom: none;
+        }
+        
+        .data-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .json-viewer {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            font-family: monospace;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-bottom: 10px;
+        }
+        
+        .admin-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        /* File Input */
+        .file-input-container {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        
+        .file-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        /* Progress bar */
+        .progress-container {
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: var(--success-color);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+        
+        /* Finance Analysis */
+        .finance-analysis {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .finance-analysis {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .finance-card {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
             .tabs {
@@ -515,28 +694,86 @@
                 flex-direction: column;
                 gap: 0;
             }
+            
+            .simulation-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
         
         /* Icons */
         .icon {
             margin-right: 8px;
         }
+        
+        /* Custom scrollbar */
+        .event-log::-webkit-scrollbar,
+        .json-viewer::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .event-log::-webkit-scrollbar-track,
+        .json-viewer::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        .event-log::-webkit-scrollbar-thumb,
+        .json-viewer::-webkit-scrollbar-thumb {
+            background: #c5c5c5;
+            border-radius: 4px;
+        }
+        
+        .event-log::-webkit-scrollbar-thumb:hover,
+        .json-viewer::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        .json-viewer::-webkit-scrollbar-thumb {
+            background: #7f8c8d;
+        }
+        
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .spinner {
+            border: 8px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 8px solid var(--primary-color);
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1><i class="fas fa-piggy-bank icon"></i>Simulation Économique</h1>
+            <h1><i class="fas fa-chart-line icon"></i>Gestion Bancaire Pro</h1>
             <div>
-                <button id="add-income" class="success"><i class="fas fa-plus-circle icon"></i>Nouvelle Entrée</button>
+                <button id="add-income" class="success"><i class="fas fa-plus-circle icon"></i>Transaction</button>
+                <button id="admin-btn" class="admin"><i class="fas fa-cog icon"></i>Admin</button>
             </div>
         </div>
         
         <!-- Simulation Panel -->
         <div class="simulation-panel">
             <div class="simulation-header">
-                <h2 class="simulation-title"><i class="fas fa-gamepad"></i> Simulation de Vie Économique</h2>
+                <h2 class="simulation-title"><i class="fas fa-business-time"></i> Simulation Économique</h2>
                 <div class="simulation-controls">
                     <button id="start-simulation" class="simulation"><i class="fas fa-play icon"></i>Démarrer</button>
                     <button id="pause-simulation" class="warning" disabled><i class="fas fa-pause icon"></i>Pause</button>
@@ -551,21 +788,25 @@
                     <div class="value" id="current-month">Mois 1</div>
                 </div>
                 <div class="simulation-stat">
-                    <h4>Revenus Mensuels</h4>
-                    <div class="value" id="sim-income">0 €</div>
+                    <h4>Revenus Personnels</h4>
+                    <div class="value positive" id="personal-income">0 €</div>
                 </div>
                 <div class="simulation-stat">
-                    <h4>Dépenses Mensuelles</h4>
-                    <div class="value" id="sim-expenses">0 €</div>
+                    <h4>Dépenses Personnelles</h4>
+                    <div class="value negative" id="personal-expenses">0 €</div>
                 </div>
                 <div class="simulation-stat">
-                    <h4>Économies</h4>
-                    <div class="value" id="sim-savings">0 €</div>
+                    <h4>Revenus Professionnels</h4>
+                    <div class="value positive" id="business-income">0 €</div>
+                </div>
+                <div class="simulation-stat">
+                    <h4>Dépenses Professionnelles</h4>
+                    <div class="value negative" id="business-expenses">0 €</div>
                 </div>
             </div>
             
             <div class="simulation-events">
-                <h4><i class="fas fa-list-alt icon"></i>Événements</h4>
+                <h4><i class="fas fa-list-alt icon"></i>Événements Récent</h4>
                 <div class="event-log" id="event-log">
                     <div class="event-entry">
                         <div class="event-date">[Système]</div>
@@ -579,13 +820,13 @@
         <div class="dashboard-container">
             <div class="dashboard personal">
                 <div class="dashboard-header">
-                    <h2 class="dashboard-title"><i class="fas fa-user"></i> Finances Personnelles</h2>
+                    <h2 class="dashboard-title"><i class="fas fa-user-tie"></i> Finances Personnelles</h2>
                     <button id="add-personal-account" class="personal"><i class="fas fa-plus icon"></i>Compte Personnel</button>
                 </div>
                 <div class="stats-grid">
                     <div class="stat-card">
                         <h4>Solde Total</h4>
-                        <div class="amount" id="personal-total-balance">0.00 €</div>
+                        <div class="amount positive" id="personal-total-balance">0.00 €</div>
                     </div>
                     <div class="stat-card">
                         <h4>Nombre de Comptes</h4>
@@ -593,11 +834,11 @@
                     </div>
                     <div class="stat-card">
                         <h4>Revenus Mensuels</h4>
-                        <div class="amount" id="personal-monthly-income">0.00 €</div>
+                        <div class="amount positive" id="personal-monthly-income">0.00 €</div>
                     </div>
                     <div class="stat-card">
                         <h4>Dépenses Mensuelles</h4>
-                        <div class="amount" id="personal-monthly-expenses">0.00 €</div>
+                        <div class="amount negative" id="personal-monthly-expenses">0.00 €</div>
                     </div>
                 </div>
             </div>
@@ -610,7 +851,7 @@
                 <div class="stats-grid">
                     <div class="stat-card">
                         <h4>Solde Total</h4>
-                        <div class="amount" id="business-total-balance">0.00 €</div>
+                        <div class="amount positive" id="business-total-balance">0.00 €</div>
                     </div>
                     <div class="stat-card">
                         <h4>Nombre de Comptes</h4>
@@ -618,11 +859,11 @@
                     </div>
                     <div class="stat-card">
                         <h4>Chiffre d'Affaires</h4>
-                        <div class="amount" id="business-revenue">0.00 €</div>
+                        <div class="amount positive" id="business-revenue">0.00 €</div>
                     </div>
                     <div class="stat-card">
                         <h4>Dépenses Opérationnelles</h4>
-                        <div class="amount" id="business-expenses">0.00 €</div>
+                        <div class="amount negative" id="business-operational-expenses">0.00 €</div>
                     </div>
                 </div>
             </div>
@@ -634,6 +875,8 @@
             <div class="tab" data-tab="transfers">Virements</div>
             <div class="tab" data-tab="transactions">Transactions</div>
             <div class="tab" data-tab="business">Entreprise</div>
+            <div class="tab" data-tab="finance">Analyse Financière</div>
+            <div class="tab" data-tab="admin"><i class="fas fa-cog"></i> Administration</div>
         </div>
         
         <!-- Section Banques -->
@@ -706,7 +949,7 @@
                 <button data-filter="income">Entrées</button>
                 <button data-filter="expense">Dépenses</button>
                 <button data-filter="transfer">Virements</button>
-                <button data-filter="simulation">Simulation</button>
+                <button data-filter="business">Professionnelles</button>
             </div>
             <table id="transactions-table">
                 <thead>
@@ -714,6 +957,7 @@
                         <th>Date</th>
                         <th>Description</th>
                         <th>Compte</th>
+                        <th>Banque</th>
                         <th>Montant</th>
                         <th>Catégorie</th>
                         <th>Actions</th>
@@ -732,9 +976,9 @@
                 <button id="launch-campaign" class="business"><i class="fas fa-bullhorn icon"></i>Lancer une Campagne</button>
             </div>
             
-            <div class="business-stats" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
-                <div class="business-stat-card" style="background: #f8f9fa; padding: 15px; border-radius: var(--border-radius);">
-                    <h3><i class="fas fa-users icon"></i>Employés</h3>
+            <div class="business-stats">
+                <div class="business-stat-card">
+                    <h3><i class="fas fa-users"></i> Employés</h3>
                     <div id="employee-count" style="font-size: 1.8rem; font-weight: bold; text-align: center;">0</div>
                     <div style="display: flex; justify-content: space-between; margin-top: 10px;">
                         <span>Salaire Mensuel:</span>
@@ -742,8 +986,8 @@
                     </div>
                 </div>
                 
-                <div class="business-stat-card" style="background: #f8f9fa; padding: 15px; border-radius: var(--border-radius);">
-                    <h3><i class="fas fa-tools icon"></i>Matériel</h3>
+                <div class="business-stat-card">
+                    <h3><i class="fas fa-tools"></i> Matériel</h3>
                     <div id="equipment-value" style="font-size: 1.8rem; font-weight: bold; text-align: center;">0 €</div>
                     <div style="display: flex; justify-content: space-between; margin-top: 10px;">
                         <span>Amortissement:</span>
@@ -751,8 +995,8 @@
                     </div>
                 </div>
                 
-                <div class="business-stat-card" style="background: #f8f9fa; padding: 15px; border-radius: var(--border-radius);">
-                    <h3><i class="fas fa-chart-line icon"></i>Performance</h3>
+                <div class="business-stat-card">
+                    <h3><i class="fas fa-chart-line"></i> Performance</h3>
                     <div id="business-performance" style="font-size: 1.8rem; font-weight: bold; text-align: center;">Stable</div>
                     <div style="display: flex; justify-content: space-between; margin-top: 10px;">
                         <span>Clients:</span>
@@ -760,8 +1004,8 @@
                     </div>
                 </div>
                 
-                <div class="business-stat-card" style="background: #f8f9fa; padding: 15px; border-radius: var(--border-radius);">
-                    <h3><i class="fas fa-bullhorn icon"></i>Marketing</h3>
+                <div class="business-stat-card">
+                    <h3><i class="fas fa-bullhorn"></i> Marketing</h3>
                     <div id="marketing-impact" style="font-size: 1.8rem; font-weight: bold; text-align: center;">0%</div>
                     <div style="display: flex; justify-content: space-between; margin-top: 10px;">
                         <span>Campagne en cours:</span>
@@ -776,12 +1020,157 @@
                     <tr>
                         <th>Date</th>
                         <th>Action</th>
+                        <th>Compte</th>
                         <th>Coût</th>
                         <th>Impact</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
             </table>
+        </div>
+        
+        <!-- Section Analyse Financière -->
+        <div id="finance" class="tab-content">
+            <h2><i class="fas fa-chart-pie icon"></i>Analyse Financière Professionnelle</h2>
+            
+            <div class="finance-analysis">
+                <div class="finance-card">
+                    <h3><i class="fas fa-money-bill-wave icon"></i>Revenus</h3>
+                    <table class="finance-table" id="revenue-table">
+                        <thead>
+                            <tr>
+                                <th>Catégorie</th>
+                                <th>Montant</th>
+                                <th>% du Total</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                
+                <div class="finance-card">
+                    <h3><i class="fas fa-receipt icon"></i>Dépenses</h3>
+                    <table class="finance-table" id="expense-table">
+                        <thead>
+                            <tr>
+                                <th>Catégorie</th>
+                                <th>Montant</th>
+                                <th>% du Total</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="finance-card" style="margin-top: 20px;">
+                <h3><i class="fas fa-balance-scale icon"></i>Bilan Mensuel</h3>
+                <table class="finance-table" id="balance-table">
+                    <thead>
+                        <tr>
+                            <th>Mois</th>
+                            <th>Revenus</th>
+                            <th>Dépenses</th>
+                            <th>Bénéfice</th>
+                            <th>Marge</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Section Admin -->
+        <div id="admin" class="tab-content">
+            <h2><i class="fas fa-cog icon"></i> Administration des Données</h2>
+            
+            <div class="admin-panel">
+                <h3><i class="fas fa-database icon"></i> Gestion des Données</h3>
+                
+                <div class="admin-buttons">
+                    <button id="export-all" class="admin"><i class="fas fa-file-export"></i> Exporter toutes les données</button>
+                    <button id="import-all" class="admin"><i class="fas fa-file-import"></i> Importer des données</button>
+                    <button id="reset-data" class="delete"><i class="fas fa-trash"></i> Réinitialiser toutes les données</button>
+                </div>
+                
+                <div class="progress-container" style="margin-top: 15px;">
+                    <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="admin-panel">
+                <h3><i class="fas fa-file-code icon"></i> Fichiers JSON</h3>
+                
+                <div class="data-section">
+                    <div class="data-header">
+                        <h4><i class="fas fa-university"></i> Banques</h4>
+                        <div>
+                            <button class="export-btn" data-type="banks"><i class="fas fa-download"></i> Exporter</button>
+                            <div class="file-input-container">
+                                <button class="import-btn"><i class="fas fa-upload"></i> Importer</button>
+                                <input type="file" class="file-input" data-type="banks" accept=".json">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="json-viewer" id="banks-json">Aucune donnée</div>
+                </div>
+                
+                <div class="data-section">
+                    <div class="data-header">
+                        <h4><i class="fas fa-wallet"></i> Comptes</h4>
+                        <div>
+                            <button class="export-btn" data-type="accounts"><i class="fas fa-download"></i> Exporter</button>
+                            <div class="file-input-container">
+                                <button class="import-btn"><i class="fas fa-upload"></i> Importer</button>
+                                <input type="file" class="file-input" data-type="accounts" accept=".json">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="json-viewer" id="accounts-json">Aucune donnée</div>
+                </div>
+                
+                <div class="data-section">
+                    <div class="data-header">
+                        <h4><i class="fas fa-exchange-alt"></i> Virements</h4>
+                        <div>
+                            <button class="export-btn" data-type="transfers"><i class="fas fa-download"></i> Exporter</button>
+                            <div class="file-input-container">
+                                <button class="import-btn"><i class="fas fa-upload"></i> Importer</button>
+                                <input type="file" class="file-input" data-type="transfers" accept=".json">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="json-viewer" id="transfers-json">Aucune donnée</div>
+                </div>
+                
+                <div class="data-section">
+                    <div class="data-header">
+                        <h4><i class="fas fa-list-alt"></i> Transactions</h4>
+                        <div>
+                            <button class="export-btn" data-type="transactions"><i class="fas fa-download"></i> Exporter</button>
+                            <div class="file-input-container">
+                                <button class="import-btn"><i class="fas fa-upload"></i> Importer</button>
+                                <input type="file" class="file-input" data-type="transactions" accept=".json">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="json-viewer" id="transactions-json">Aucune donnée</div>
+                </div>
+                
+                <div class="data-section">
+                    <div class="data-header">
+                        <h4><i class="fas fa-chart-line"></i> Simulation</h4>
+                        <div>
+                            <button class="export-btn" data-type="simulation"><i class="fas fa-download"></i> Exporter</button>
+                            <div class="file-input-container">
+                                <button class="import-btn"><i class="fas fa-upload"></i> Importer</button>
+                                <input type="file" class="file-input" data-type="simulation" accept=".json">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="json-viewer" id="simulation-json">Aucune donnée</div>
+                </div>
+            </div>
         </div>
         
         <!-- Modals -->
@@ -794,16 +1183,21 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Loading Indicator -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+        </div>
     </div>
-    
+
     <script>
         // Données de l'application
         const app = {
             // Données de base
-            banks: JSON.parse(localStorage.getItem('banks')) || [],
-            accounts: JSON.parse(localStorage.getItem('accounts')) || [],
-            transfers: JSON.parse(localStorage.getItem('transfers')) || [],
-            transactions: JSON.parse(localStorage.getItem('transactions')) || [],
+            banks: [],
+            accounts: [],
+            transfers: [],
+            transactions: [],
             timers: {},
             
             // Données de simulation
@@ -811,7 +1205,7 @@
                 running: false,
                 currentMonth: 1,
                 intervalId: null,
-                speed: 1000, // 1 seconde = 1 mois
+                speed: 3000, // 3 secondes = 1 mois
                 
                 // Statistiques personnelles
                 personal: {
@@ -874,6 +1268,9 @@
             
             // Initialisation
             init: function() {
+                // Charger les données
+                this.loadData();
+                
                 // Gestion des onglets
                 document.querySelectorAll('.tab').forEach(tab => {
                     tab.addEventListener('click', function() {
@@ -882,7 +1279,22 @@
                         
                         this.classList.add('active');
                         document.getElementById(this.dataset.tab).classList.add('active');
+                        
+                        // Si on ouvre l'analyse financière, on la met à jour
+                        if (this.dataset.tab === 'finance') {
+                            app.updateFinancialAnalysis();
+                        }
                     });
+                });
+                
+                // Bouton Admin
+                document.getElementById('admin-btn').addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    document.querySelector('.tab[data-tab="admin"]').classList.add('active');
+                    document.getElementById('admin').classList.add('active');
+                    this.updateJsonViewers();
                 });
                 
                 // Filtres des comptes
@@ -907,7 +1319,7 @@
                 document.getElementById('add-bank').addEventListener('click', () => this.showBankForm());
                 document.getElementById('add-personal-account').addEventListener('click', () => this.showAccountForm('personal'));
                 document.getElementById('add-business-account').addEventListener('click', () => this.showAccountForm('business'));
-                document.getElementById('add-income').addEventListener('click', () => this.showTransactionForm('income'));
+                document.getElementById('add-income').addEventListener('click', () => this.showTransactionForm());
                 document.getElementById('add-transfer').addEventListener('click', () => this.showTransferForm());
                 document.getElementById('add-offshore-transfer').addEventListener('click', () => this.showTransferForm('offshore'));
                 
@@ -926,8 +1338,23 @@
                 document.getElementById('buy-equipment').addEventListener('click', () => this.showBuyEquipmentForm());
                 document.getElementById('launch-campaign').addEventListener('click', () => this.showLaunchCampaignForm());
                 
-                // Charger les données
-                this.loadData();
+                // Boutons d'administration
+                document.getElementById('export-all').addEventListener('click', () => this.exportAllData());
+                document.getElementById('import-all').addEventListener('click', () => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = '.json';
+                    input.onchange = (e) => this.importAllData(e.target.files[0]);
+                    input.click();
+                });
+                document.getElementById('reset-data').addEventListener('click', () => this.resetAllData());
+                
+                // Gestion de l'import pour chaque type
+                document.querySelectorAll('.file-input').forEach(input => {
+                    input.addEventListener('change', function(e) {
+                        app.importData(this.dataset.type, e.target.files[0]);
+                    });
+                });
                 
                 // Démarrer les virements programmés
                 this.startScheduledTransfers();
@@ -935,19 +1362,45 @@
                 // Mettre à jour les dashboards
                 this.updateDashboards();
                 
-                // Charger les données de simulation si elles existent
-                const savedSimulation = localStorage.getItem('simulation');
+                // Mettre à jour l'affichage de la simulation
+                this.updateSimulationDisplay();
+            },
+            
+            // Charger les données depuis le localStorage
+            loadData: function() {
+                this.banks = JSON.parse(localStorage.getItem('banks')) || [];
+                this.accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+                this.transfers = JSON.parse(localStorage.getItem('transfers')) || [];
+                this.transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+                
+                const savedSimulation = JSON.parse(localStorage.getItem('simulation'));
                 if (savedSimulation) {
                     this.simulation = {
                         ...this.simulation,
-                        ...JSON.parse(savedSimulation),
+                        ...savedSimulation,
                         running: false,
                         intervalId: null
                     };
                 }
                 
-                // Mettre à jour l'affichage de la simulation
-                this.updateSimulationDisplay();
+                this.loadBanks();
+                this.loadAccounts();
+                this.loadTransfers();
+                this.loadTransactions();
+            },
+            
+            // Sauvegarder les données dans le localStorage
+            saveData: function() {
+                localStorage.setItem('banks', JSON.stringify(this.banks));
+                localStorage.setItem('accounts', JSON.stringify(this.accounts));
+                localStorage.setItem('transfers', JSON.stringify(this.transfers));
+                localStorage.setItem('transactions', JSON.stringify(this.transactions));
+                localStorage.setItem('simulation', JSON.stringify({
+                    currentMonth: this.simulation.currentMonth,
+                    personal: this.simulation.personal,
+                    business: this.simulation.business,
+                    events: this.simulation.events.slice(-50)
+                }));
             },
             
             // Simulation économique
@@ -989,21 +1442,13 @@
             
             simulateMonth: function() {
                 this.simulation.currentMonth++;
-                
-                // Mettre à jour l'affichage du mois
                 document.getElementById('current-month').textContent = `Mois ${this.simulation.currentMonth}`;
                 
-                // Trouver le compte personnel principal
-                const personalAccount = this.accounts.find(a => a.type === 'personal') || 
-                                      (this.accounts.length > 0 ? this.accounts[0] : null);
-                
-                // Trouver le compte professionnel principal
-                const businessAccount = this.accounts.find(a => a.type === 'business') || 
-                                       (this.accounts.length > 1 ? this.accounts[1] : null);
+                const personalAccount = this.accounts.find(a => a.type === 'personal');
+                const businessAccount = this.accounts.find(a => a.type === 'business');
                 
                 // Événements personnels
                 if (personalAccount) {
-                    // Salaire
                     const salary = this.simulation.personal.salary;
                     this.addTransaction({
                         accountId: personalAccount.id,
@@ -1013,11 +1458,9 @@
                         description: 'Salaire mensuel',
                         simulation: true
                     });
-                    
                     this.logEvent(`Salaire reçu: +${salary.toFixed(2)}€`);
                     
-                    // Dépenses de vie
-                    const expenses = this.simulation.personal.livingExpenses * (0.9 + Math.random() * 0.2); // Variation aléatoire
+                    const expenses = this.simulation.personal.livingExpenses * (0.9 + Math.random() * 0.2);
                     this.addTransaction({
                         accountId: personalAccount.id,
                         amount: expenses,
@@ -1026,12 +1469,10 @@
                         description: 'Dépenses mensuelles',
                         simulation: true
                     });
-                    
                     this.logEvent(`Dépenses mensuelles: -${expenses.toFixed(2)}€`);
                     
-                    // Événements aléatoires
                     if (this.simulation.personal.randomEvents && Math.random() > 0.7) {
-                        const eventAmount = 50 + Math.random() * 450; // Entre 50€ et 500€
+                        const eventAmount = 50 + Math.random() * 450;
                         const isPositive = Math.random() > 0.4;
                         
                         if (isPositive) {
@@ -1060,7 +1501,6 @@
                 
                 // Événements professionnels
                 if (businessAccount) {
-                    // Calculer le revenu de l'entreprise
                     const baseRevenue = this.simulation.business.baseRevenue;
                     const employeeProductivity = this.simulation.business.employees.reduce(
                         (sum, emp) => sum + emp.productivity, 0
@@ -1077,10 +1517,8 @@
                         description: 'Revenus mensuels',
                         simulation: true
                     });
-                    
                     this.logEvent(`Revenus d'entreprise: +${revenue.toFixed(2)}€`);
                     
-                    // Payer les salaires
                     const salaries = this.simulation.business.employees.reduce(
                         (sum, emp) => sum + emp.salary, 0
                     );
@@ -1094,11 +1532,9 @@
                             description: 'Paiement des salaires',
                             simulation: true
                         });
-                        
                         this.logEvent(`Salaires payés: -${salaries.toFixed(2)}€`);
                     }
                     
-                    // Amortissement de l'équipement
                     const depreciation = this.simulation.business.equipment.reduce(
                         (sum, eq) => sum + eq.depreciation, 0
                     );
@@ -1112,23 +1548,19 @@
                             description: 'Amortissement du matériel',
                             simulation: true
                         });
-                        
                         this.logEvent(`Amortissement matériel: -${depreciation.toFixed(2)}€`);
                     }
                     
-                    // Mettre à jour les campagnes
                     this.updateCampaigns();
                     
-                    // Mettre à jour les clients (aléatoire basé sur la performance)
                     if (Math.random() < 0.3 * this.simulation.business.performance) {
                         const newCustomers = Math.floor(1 + Math.random() * 5 * this.simulation.business.marketingImpact);
                         this.simulation.business.customers += newCustomers;
                         this.logEvent(`Nouveaux clients: +${newCustomers}`);
                     }
                     
-                    // Événements aléatoires d'entreprise
                     if (Math.random() > 0.8) {
-                        const eventAmount = 200 + Math.random() * 1800; // Entre 200€ et 2000€
+                        const eventAmount = 200 + Math.random() * 1800;
                         const isPositive = Math.random() > 0.3;
                         
                         if (isPositive) {
@@ -1155,33 +1587,19 @@
                     }
                 }
                 
-                // Mettre à jour les statistiques de simulation
                 this.updateSimulationStats();
-                
-                // Mettre à jour les dashboards
                 this.updateDashboards();
-                
-                // Sauvegarder l'état de la simulation
-                localStorage.setItem('simulation', JSON.stringify({
-                    currentMonth: this.simulation.currentMonth,
-                    personal: this.simulation.personal,
-                    business: this.simulation.business,
-                    events: this.simulation.events.slice(-50) // Garder seulement les 50 derniers événements
-                }));
+                this.saveData();
             },
             
             updateCampaigns: function() {
-                // Mettre à jour les campagnes en cours
                 this.simulation.business.campaigns = this.simulation.business.campaigns
-                    .map(campaign => {
-                        return {
-                            ...campaign,
-                            remainingDuration: campaign.remainingDuration - 1
-                        };
-                    })
+                    .map(campaign => ({
+                        ...campaign,
+                        remainingDuration: campaign.remainingDuration - 1
+                    }))
                     .filter(campaign => campaign.remainingDuration > 0);
                 
-                // Calculer l'impact marketing
                 if (this.simulation.business.campaigns.length > 0) {
                     this.simulation.business.marketingImpact = 1.0 + 
                         this.simulation.business.campaigns.reduce(
@@ -1193,7 +1611,6 @@
             },
             
             updateSimulationStats: function() {
-                // Calculer les revenus/dépenses du mois
                 const personalTransactions = this.transactions
                     .filter(t => {
                         const account = this.accounts.find(a => a.id === t.accountId);
@@ -1209,21 +1626,31 @@
                     .filter(t => t.type === 'expense')
                     .reduce((sum, t) => sum + t.amount, 0);
                 
-                document.getElementById('sim-income').textContent = personalIncome.toFixed(2) + ' €';
-                document.getElementById('sim-expenses').textContent = personalExpenses.toFixed(2) + ' €';
+                document.getElementById('personal-income').textContent = personalIncome.toFixed(2) + ' €';
+                document.getElementById('personal-expenses').textContent = personalExpenses.toFixed(2) + ' €';
                 
-                // Calculer les économies
-                const personalAccounts = this.accounts.filter(a => a.type === 'personal');
-                const savings = personalAccounts.reduce((sum, a) => sum + a.balance, 0);
-                document.getElementById('sim-savings').textContent = savings.toFixed(2) + ' €';
-                document.getElementById('sim-savings').className = savings >= 0 ? 'value positive' : 'value negative';
+                const businessTransactions = this.transactions
+                    .filter(t => {
+                        const account = this.accounts.find(a => a.id === t.accountId);
+                        return account && (account.type === 'business' || account.type === 'offshore') && 
+                               t.simulation && t.date >= Date.now() - 30 * 24 * 60 * 60 * 1000;
+                    });
+                
+                const businessIncome = businessTransactions
+                    .filter(t => t.type === 'income')
+                    .reduce((sum, t) => sum + t.amount, 0);
+                
+                const businessExpenses = businessTransactions
+                    .filter(t => t.type === 'expense')
+                    .reduce((sum, t) => sum + t.amount, 0);
+                
+                document.getElementById('business-income').textContent = businessIncome.toFixed(2) + ' €';
+                document.getElementById('business-expenses').textContent = businessExpenses.toFixed(2) + ' €';
             },
             
             updateSimulationDisplay: function() {
-                // Mettre à jour le mois en cours
                 document.getElementById('current-month').textContent = `Mois ${this.simulation.currentMonth}`;
                 
-                // Mettre à jour les statistiques d'entreprise
                 document.getElementById('employee-count').textContent = this.simulation.business.employees.length;
                 document.getElementById('employee-salaries').textContent = 
                     this.simulation.business.employees.reduce((sum, emp) => sum + emp.salary, 0).toFixed(2) + ' €';
@@ -1235,7 +1662,6 @@
                 
                 document.getElementById('customer-count').textContent = this.simulation.business.customers;
                 
-                // Mettre à jour la performance
                 let performanceText;
                 let performanceClass;
                 if (this.simulation.business.performance > 1.2) {
@@ -1256,7 +1682,6 @@
                 performanceElement.textContent = performanceText;
                 performanceElement.className = performanceClass;
                 
-                // Mettre à jour le marketing
                 document.getElementById('marketing-impact').textContent = 
                     Math.round((this.simulation.business.marketingImpact - 1) * 100) + '%';
                 
@@ -1264,12 +1689,10 @@
                 document.getElementById('current-campaign').textContent = 
                     currentCampaign ? `${currentCampaign.name} (${currentCampaign.remainingDuration} mois)` : 'Aucune';
                 
-                // Mettre à jour le journal des événements
                 this.simulation.events.forEach(event => {
                     this.logEvent(event.message, event.date);
                 });
                 
-                // Mettre à jour l'activité de l'entreprise
                 this.updateBusinessActivity();
             },
             
@@ -1288,29 +1711,187 @@
                 
                 eventLog.prepend(eventEntry);
                 
-                // Garder seulement les 50 derniers événements dans le journal
                 while (eventLog.children.length > 50) {
                     eventLog.removeChild(eventLog.lastChild);
                 }
                 
-                // Ajouter à l'historique des événements
                 if (timestamp === null) {
                     this.simulation.events.unshift({
                         date: date.getTime(),
                         message: message
                     });
                     
-                    // Garder seulement les 100 derniers événements en mémoire
                     if (this.simulation.events.length > 100) {
                         this.simulation.events.pop();
                     }
                 }
             },
             
+            // Analyse financière
+            updateFinancialAnalysis: function() {
+                const businessTransactions = this.getBusinessTransactions();
+                
+                // Analyser les revenus par catégorie
+                const revenueByCategory = {};
+                businessTransactions.transactions
+                    .filter(t => t.type === 'income')
+                    .forEach(t => {
+                        const category = t.category || 'Autres';
+                        revenueByCategory[category] = (revenueByCategory[category] || 0) + t.amount;
+                    });
+                
+                // Trier les catégories de revenus
+                const sortedRevenueCategories = Object.keys(revenueByCategory)
+                    .map(category => ({
+                        category: category,
+                        amount: revenueByCategory[category]
+                    }))
+                    .sort((a, b) => b.amount - a.amount);
+                
+                // Remplir le tableau des revenus
+                const revenueTable = document.querySelector('#revenue-table tbody');
+                revenueTable.innerHTML = '';
+                
+                let totalRevenue = 0;
+                sortedRevenueCategories.forEach(item => {
+                    totalRevenue += item.amount;
+                    
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${item.category}</td>
+                        <td>${item.amount.toFixed(2)} €</td>
+                        <td>${businessTransactions.revenues > 0 ? (item.amount / businessTransactions.revenues * 100).toFixed(1) : '0'}%</td>
+                    `;
+                    revenueTable.appendChild(tr);
+                });
+                
+                // Ajouter la ligne de total
+                const totalRevenueRow = document.createElement('tr');
+                totalRevenueRow.innerHTML = `
+                    <td><strong>Total</strong></td>
+                    <td><strong>${totalRevenue.toFixed(2)} €</strong></td>
+                    <td>100%</td>
+                `;
+                revenueTable.appendChild(totalRevenueRow);
+                
+                // Analyser les dépenses par catégorie
+                const expenseByCategory = {};
+                businessTransactions.transactions
+                    .filter(t => t.type === 'expense')
+                    .forEach(t => {
+                        const category = t.category || 'Autres';
+                        expenseByCategory[category] = (expenseByCategory[category] || 0) + t.amount;
+                    });
+                
+                // Trier les catégories de dépenses
+                const sortedExpenseCategories = Object.keys(expenseByCategory)
+                    .map(category => ({
+                        category: category,
+                        amount: expenseByCategory[category]
+                    }))
+                    .sort((a, b) => b.amount - a.amount);
+                
+                // Remplir le tableau des dépenses
+                const expenseTable = document.querySelector('#expense-table tbody');
+                expenseTable.innerHTML = '';
+                
+                let totalExpense = 0;
+                sortedExpenseCategories.forEach(item => {
+                    totalExpense += item.amount;
+                    
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${item.category}</td>
+                        <td>${item.amount.toFixed(2)} €</td>
+                        <td>${businessTransactions.expenses > 0 ? (item.amount / businessTransactions.expenses * 100).toFixed(1) : '0'}%</td>
+                    `;
+                    expenseTable.appendChild(tr);
+                });
+                
+                // Ajouter la ligne de total
+                const totalExpenseRow = document.createElement('tr');
+                totalExpenseRow.innerHTML = `
+                    <td><strong>Total</strong></td>
+                    <td><strong>${totalExpense.toFixed(2)} €</strong></td>
+                    <td>100%</td>
+                `;
+                expenseTable.appendChild(totalExpenseRow);
+                
+                // Préparer le bilan mensuel (groupé par mois)
+                const monthlyBalance = {};
+                businessTransactions.transactions.forEach(t => {
+                    const date = new Date(t.date);
+                    const monthYear = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+                    
+                    if (!monthlyBalance[monthYear]) {
+                        monthlyBalance[monthYear] = {
+                            revenue: 0,
+                            expense: 0
+                        };
+                    }
+                    
+                    if (t.type === 'income') {
+                        monthlyBalance[monthYear].revenue += t.amount;
+                    } else {
+                        monthlyBalance[monthYear].expense += t.amount;
+                    }
+                });
+                
+                // Trier les mois chronologiquement
+                const sortedMonths = Object.keys(monthlyBalance)
+                    .sort()
+                    .map(month => ({
+                        month: month,
+                        ...monthlyBalance[month]
+                    }));
+                
+                // Remplir le tableau du bilan mensuel
+                const balanceTable = document.querySelector('#balance-table tbody');
+                balanceTable.innerHTML = '';
+                
+                sortedMonths.forEach(monthData => {
+                    const profit = monthData.revenue - monthData.expense;
+                    const margin = monthData.revenue > 0 ? (profit / monthData.revenue * 100) : 0;
+                    
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${monthData.month}</td>
+                        <td>${monthData.revenue.toFixed(2)} €</td>
+                        <td>${monthData.expense.toFixed(2)} €</td>
+                        <td class="${profit >= 0 ? 'positive' : 'negative'}">${profit.toFixed(2)} €</td>
+                        <td class="${margin >= 0 ? 'positive' : 'negative'}">${margin.toFixed(1)}%</td>
+                    `;
+                    balanceTable.appendChild(tr);
+                });
+            },
+            
+            // Obtenir les transactions professionnelles
+            getBusinessTransactions: function() {
+                const businessAccounts = this.accounts.filter(a => a.type === 'business' || a.type === 'offshore');
+                const businessAccountIds = businessAccounts.map(a => a.id);
+                
+                const transactions = this.transactions.filter(t => businessAccountIds.includes(t.accountId));
+                
+                const revenues = transactions
+                    .filter(t => t.type === 'income')
+                    .reduce((sum, t) => sum + t.amount, 0);
+                
+                const expenses = transactions
+                    .filter(t => t.type === 'expense')
+                    .reduce((sum, t) => sum + t.amount, 0);
+                
+                return {
+                    transactions: transactions,
+                    revenues: revenues,
+                    expenses: expenses,
+                    profit: revenues - expenses
+                };
+            },
+            
             // Gestion d'entreprise
             showHireEmployeeForm: function() {
                 document.getElementById('modal-body').innerHTML = `
-                    <h3 class="modal-title"><i class="fas fa-user-plus icon"></i>Embaucher un Employé</h3>
+                    <h3 class="modal-title"><i class="fas fa-user-plus"></i> Embaucher un Employé</h3>
                     <div class="form-group">
                         <label for="employee-type">Type d'employé</label>
                         <select id="employee-type">
@@ -1323,13 +1904,51 @@
                         <label for="employee-name">Nom (optionnel)</label>
                         <input type="text" id="employee-name" placeholder="Nom de l'employé">
                     </div>
+                    <div class="form-group">
+                        <label for="business-account">Compte professionnel</label>
+                        <select id="business-account" required>
+                            <option value="">Sélectionnez un compte</option>
+                            ${this.accounts
+                                .filter(a => a.type === 'business')
+                                .map(account => 
+                                    `<option value="${account.id}">
+                                        ${account.name} (${this.getBankName(account.bankId)}) - ${account.balance.toFixed(2)}€
+                                    </option>`
+                                ).join('')}
+                        </select>
+                    </div>
                 `;
                 this.openModal('hire-employee', false);
             },
             
+            hireEmployee: function() {
+                const typeIndex = parseInt(document.getElementById('employee-type').value);
+                const name = document.getElementById('employee-name').value || this.employeeTypes[typeIndex].name;
+                const employeeType = this.employeeTypes[typeIndex];
+                const accountId = document.getElementById('business-account').value;
+                
+                const newEmployee = {
+                    id: Date.now().toString(),
+                    name: name,
+                    type: typeIndex,
+                    salary: employeeType.salary,
+                    productivity: employeeType.productivity,
+                    hireDate: Date.now()
+                };
+                
+                this.simulation.business.employees.push(newEmployee);
+                this.simulation.business.performance = Math.min(1.5, this.simulation.business.performance + 0.05);
+                
+                this.logEvent(`Nouvel employé embauché: ${name} (${employeeType.name})`);
+                this.updateSimulationDisplay();
+                this.updateBusinessActivity();
+                this.saveData();
+                this.closeModal();
+            },
+            
             showBuyEquipmentForm: function() {
                 document.getElementById('modal-body').innerHTML = `
-                    <h3 class="modal-title"><i class="fas fa-tools icon"></i>Acheter du Matériel</h3>
+                    <h3 class="modal-title"><i class="fas fa-tools"></i> Acheter du Matériel</h3>
                     <div class="form-group">
                         <label for="equipment-type">Type de matériel</label>
                         <select id="equipment-type">
@@ -1342,13 +1961,62 @@
                         <label for="equipment-quantity">Quantité</label>
                         <input type="number" id="equipment-quantity" value="1" min="1">
                     </div>
+                    <div class="form-group">
+                        <label for="business-account">Compte professionnel</label>
+                        <select id="business-account" required>
+                            <option value="">Sélectionnez un compte</option>
+                            ${this.accounts
+                                .filter(a => a.type === 'business')
+                                .map(account => 
+                                    `<option value="${account.id}">
+                                        ${account.name} (${this.getBankName(account.bankId)}) - ${account.balance.toFixed(2)}€
+                                    </option>`
+                                ).join('')}
+                        </select>
+                    </div>
                 `;
                 this.openModal('buy-equipment', false);
             },
             
+            buyEquipment: function() {
+                const typeIndex = parseInt(document.getElementById('equipment-type').value);
+                const quantity = parseInt(document.getElementById('equipment-quantity').value);
+                const equipmentType = this.equipmentTypes[typeIndex];
+                const totalCost = equipmentType.cost * quantity;
+                const accountId = document.getElementById('business-account').value;
+                
+                this.addTransaction({
+                    accountId: accountId,
+                    amount: totalCost,
+                    type: 'expense',
+                    category: 'Matériel',
+                    description: `Achat de ${quantity} ${equipmentType.name}`,
+                    simulation: false
+                });
+                
+                for (let i = 0; i < quantity; i++) {
+                    this.simulation.business.equipment.push({
+                        id: Date.now().toString() + i,
+                        type: typeIndex,
+                        name: equipmentType.name,
+                        cost: equipmentType.cost,
+                        lifespan: equipmentType.lifespan,
+                        depreciation: equipmentType.depreciation,
+                        purchaseDate: Date.now()
+                    });
+                }
+                
+                this.simulation.business.performance = Math.min(1.5, this.simulation.business.performance + 0.03 * quantity);
+                this.logEvent(`Matériel acheté: ${quantity} ${equipmentType.name}`);
+                this.updateSimulationDisplay();
+                this.updateBusinessActivity();
+                this.saveData();
+                this.closeModal();
+            },
+            
             showLaunchCampaignForm: function() {
                 document.getElementById('modal-body').innerHTML = `
-                    <h3 class="modal-title"><i class="fas fa-bullhorn icon"></i>Lancer une Campagne Marketing</h3>
+                    <h3 class="modal-title"><i class="fas fa-bullhorn"></i> Lancer une Campagne Marketing</h3>
                     <div class="form-group">
                         <label for="campaign-type">Type de campagne</label>
                         <select id="campaign-type">
@@ -1361,89 +2029,30 @@
                         <label for="campaign-name">Nom (optionnel)</label>
                         <input type="text" id="campaign-name" placeholder="Nom de la campagne">
                     </div>
+                    <div class="form-group">
+                        <label for="business-account">Compte professionnel</label>
+                        <select id="business-account" required>
+                            <option value="">Sélectionnez un compte</option>
+                            ${this.accounts
+                                .filter(a => a.type === 'business')
+                                .map(account => 
+                                    `<option value="${account.id}">
+                                        ${account.name} (${this.getBankName(account.bankId)}) - ${account.balance.toFixed(2)}€
+                                    </option>`
+                                ).join('')}
+                        </select>
+                    </div>
                 `;
                 this.openModal('launch-campaign', false);
-            },
-            
-            hireEmployee: function() {
-                const typeIndex = parseInt(document.getElementById('employee-type').value);
-                const name = document.getElementById('employee-name').value || this.employeeTypes[typeIndex].name;
-                const employeeType = this.employeeTypes[typeIndex];
-                
-                const newEmployee = {
-                    id: Date.now().toString(),
-                    name: name,
-                    type: typeIndex,
-                    salary: employeeType.salary,
-                    productivity: employeeType.productivity,
-                    hireDate: Date.now()
-                };
-                
-                this.simulation.business.employees.push(newEmployee);
-                
-                // Améliorer légèrement la performance
-                this.simulation.business.performance = Math.min(
-                    1.5, 
-                    this.simulation.business.performance + 0.05
-                );
-                
-                this.logEvent(`Nouvel employé embauché: ${name} (${employeeType.name})`);
-                this.updateSimulationDisplay();
-                this.updateBusinessActivity();
-                
-                // Sauvegarder l'état de la simulation
-                localStorage.setItem('simulation', JSON.stringify({
-                    currentMonth: this.simulation.currentMonth,
-                    personal: this.simulation.personal,
-                    business: this.simulation.business,
-                    events: this.simulation.events.slice(-50)
-                }));
-            },
-            
-            buyEquipment: function() {
-                const typeIndex = parseInt(document.getElementById('equipment-type').value);
-                const quantity = parseInt(document.getElementById('equipment-quantity').value);
-                const equipmentType = this.equipmentTypes[typeIndex];
-                
-                for (let i = 0; i < quantity; i++) {
-                    const newEquipment = {
-                        id: Date.now().toString() + i,
-                        type: typeIndex,
-                        name: equipmentType.name,
-                        cost: equipmentType.cost,
-                        lifespan: equipmentType.lifespan,
-                        depreciation: equipmentType.depreciation,
-                        purchaseDate: Date.now()
-                    };
-                    
-                    this.simulation.business.equipment.push(newEquipment);
-                }
-                
-                // Améliorer légèrement la performance
-                this.simulation.business.performance = Math.min(
-                    1.5, 
-                    this.simulation.business.performance + 0.03 * quantity
-                );
-                
-                this.logEvent(`Matériel acheté: ${quantity} ${equipmentType.name}`);
-                this.updateSimulationDisplay();
-                this.updateBusinessActivity();
-                
-                // Sauvegarder l'état de la simulation
-                localStorage.setItem('simulation', JSON.stringify({
-                    currentMonth: this.simulation.currentMonth,
-                    personal: this.simulation.personal,
-                    business: this.simulation.business,
-                    events: this.simulation.events.slice(-50)
-                }));
             },
             
             launchCampaign: function() {
                 const typeIndex = parseInt(document.getElementById('campaign-type').value);
                 const name = document.getElementById('campaign-name').value || this.campaignTypes[typeIndex].name;
                 const campaignType = this.campaignTypes[typeIndex];
+                const accountId = document.getElementById('business-account').value;
                 
-                const newCampaign = {
+                this.simulation.business.campaigns.push({
                     id: Date.now().toString(),
                     name: name,
                     type: typeIndex,
@@ -1452,43 +2061,28 @@
                     remainingDuration: campaignType.duration,
                     impact: campaignType.impact,
                     startDate: Date.now()
-                };
+                });
                 
-                this.simulation.business.campaigns.push(newCampaign);
-                
-                // Trouver un compte professionnel pour payer
-                const businessAccount = this.accounts.find(a => a.type === 'business') || 
-                                      (this.accounts.length > 0 ? this.accounts[0] : null);
-                
-                if (businessAccount) {
-                    this.addTransaction({
-                        accountId: businessAccount.id,
-                        amount: campaignType.cost,
-                        type: 'expense',
-                        category: 'Marketing',
-                        description: `Campagne: ${name}`,
-                        simulation: true
-                    });
-                }
+                this.addTransaction({
+                    accountId: accountId,
+                    amount: campaignType.cost,
+                    type: 'expense',
+                    category: 'Marketing',
+                    description: `Campagne: ${name}`,
+                    simulation: true
+                });
                 
                 this.logEvent(`Campagne lancée: ${name}`);
                 this.updateSimulationDisplay();
                 this.updateBusinessActivity();
-                
-                // Sauvegarder l'état de la simulation
-                localStorage.setItem('simulation', JSON.stringify({
-                    currentMonth: this.simulation.currentMonth,
-                    personal: this.simulation.personal,
-                    business: this.simulation.business,
-                    events: this.simulation.events.slice(-50)
-                }));
+                this.saveData();
+                this.closeModal();
             },
             
             updateBusinessActivity: function() {
                 const tbody = document.querySelector('#business-activity-table tbody');
                 tbody.innerHTML = '';
                 
-                // Afficher les employés récents
                 const recentEmployees = [...this.simulation.business.employees]
                     .sort((a, b) => b.hireDate - a.hireDate)
                     .slice(0, 3);
@@ -1498,13 +2092,13 @@
                     tr.innerHTML = `
                         <td>${new Date(emp.hireDate).toLocaleDateString()}</td>
                         <td>Embauche: ${emp.name} (${this.employeeTypes[emp.type].name})</td>
+                        <td>Compte professionnel</td>
                         <td>${this.employeeTypes[emp.type].salary.toFixed(2)} €/mois</td>
                         <td>+${(this.employeeTypes[emp.type].productivity * 100).toFixed(0)}% prod.</td>
                     `;
                     tbody.appendChild(tr);
                 });
                 
-                // Afficher le matériel récent
                 const recentEquipment = [...this.simulation.business.equipment]
                     .sort((a, b) => b.purchaseDate - a.purchaseDate)
                     .slice(0, 2);
@@ -1514,13 +2108,13 @@
                     tr.innerHTML = `
                         <td>${new Date(eq.purchaseDate).toLocaleDateString()}</td>
                         <td>Achat: ${eq.name}</td>
+                        <td>Compte professionnel</td>
                         <td>${eq.cost.toFixed(2)} €</td>
                         <td>${eq.depreciation.toFixed(2)} €/mois</td>
                     `;
                     tbody.appendChild(tr);
                 });
                 
-                // Afficher les campagnes récentes
                 const recentCampaigns = [...this.simulation.business.campaigns]
                     .sort((a, b) => b.startDate - a.startDate)
                     .slice(0, 2);
@@ -1530,6 +2124,7 @@
                     tr.innerHTML = `
                         <td>${new Date(camp.startDate).toLocaleDateString()}</td>
                         <td>Campagne: ${camp.name}</td>
+                        <td>Compte professionnel</td>
                         <td>${camp.cost.toFixed(2)} €</td>
                         <td>+${(camp.impact * 100).toFixed(0)}% impact</td>
                     `;
@@ -1543,10 +2138,8 @@
                 const personalAccounts = this.accounts.filter(a => a.type === 'personal');
                 const personalBalance = personalAccounts.reduce((sum, account) => sum + account.balance, 0);
                 document.getElementById('personal-total-balance').textContent = personalBalance.toFixed(2) + ' €';
-                document.getElementById('personal-total-balance').className = personalBalance >= 0 ? 'amount positive' : 'amount negative';
                 document.getElementById('personal-accounts-count').textContent = personalAccounts.length;
                 
-                // Calcul des revenus/dépenses personnels (30 derniers jours)
                 const personalTransactions = this.transactions.filter(t => {
                     const account = this.accounts.find(a => a.id === t.accountId);
                     return account && account.type === 'personal';
@@ -1567,10 +2160,8 @@
                 const businessAccounts = this.accounts.filter(a => a.type === 'business' || a.type === 'offshore');
                 const businessBalance = businessAccounts.reduce((sum, account) => sum + account.balance, 0);
                 document.getElementById('business-total-balance').textContent = businessBalance.toFixed(2) + ' €';
-                document.getElementById('business-total-balance').className = businessBalance >= 0 ? 'amount positive' : 'amount negative';
                 document.getElementById('business-accounts-count').textContent = businessAccounts.length;
                 
-                // Calcul des revenus/dépenses professionnels
                 const businessTransactions = this.transactions.filter(t => {
                     const account = this.accounts.find(a => a.id === t.accountId);
                     return account && (account.type === 'business' || account.type === 'offshore');
@@ -1585,22 +2176,14 @@
                     .reduce((sum, t) => sum + t.amount, 0);
                 
                 document.getElementById('business-revenue').textContent = businessRevenue.toFixed(2) + ' €';
-                document.getElementById('business-expenses').textContent = businessExpenses.toFixed(2) + ' €';
-            },
-            
-            // Charger toutes les données
-            loadData: function() {
-                this.loadBanks();
-                this.loadAccounts();
-                this.loadTransfers();
-                this.loadTransactions();
+                document.getElementById('business-operational-expenses').textContent = businessExpenses.toFixed(2) + ' €';
             },
             
             // Fonctions pour afficher les formulaires
             showBankForm: function(bank = null) {
                 const isEdit = bank !== null;
                 document.getElementById('modal-body').innerHTML = `
-                    <h3 class="modal-title"><i class="fas fa-university icon"></i>${isEdit ? 'Modifier' : 'Ajouter'} une Banque</h3>
+                    <h3 class="modal-title"><i class="fas fa-university"></i> ${isEdit ? 'Modifier' : 'Ajouter'} une Banque</h3>
                     <div class="form-group">
                         <label for="bank-name">Nom de la banque</label>
                         <input type="text" id="bank-name" value="${isEdit ? bank.name : ''}" required>
@@ -1635,7 +2218,7 @@
                 const accountType = isEdit ? account.type : type;
                 
                 document.getElementById('modal-body').innerHTML = `
-                    <h3 class="modal-title"><i class="fas fa-wallet icon"></i>${isEdit ? 'Modifier' : 'Ajouter'} un Compte ${this.accountTypes[accountType].name}</h3>
+                    <h3 class="modal-title"><i class="fas fa-wallet"></i> ${isEdit ? 'Modifier' : 'Ajouter'} un Compte ${this.accountTypes[accountType].name}</h3>
                     <div class="form-group">
                         <label for="account-name">Nom du compte</label>
                         <input type="text" id="account-name" value="${isEdit ? account.name : ''}" required>
@@ -1676,12 +2259,12 @@
                 this.openModal('account', isEdit);
             },
             
-            showTransactionForm: function(type = 'income', transaction = null) {
+            showTransactionForm: function(transaction = null) {
                 const isEdit = transaction !== null;
-                const transactionType = isEdit ? transaction.type : type;
+                const transactionType = isEdit ? transaction.type : 'income';
                 
                 document.getElementById('modal-body').innerHTML = `
-                    <h3 class="modal-title"><i class="fas fa-money-bill-wave icon"></i>${isEdit ? 'Modifier' : 'Nouvelle'} ${transactionType === 'income' ? 'Entrée' : 'Dépense'}</h3>
+                    <h3 class="modal-title"><i class="fas fa-money-bill-wave"></i> ${isEdit ? 'Modifier' : 'Nouvelle'} Transaction</h3>
                     <div class="form-group">
                         <label for="transaction-description">Description</label>
                         <input type="text" id="transaction-description" value="${isEdit ? transaction.description : ''}" required>
@@ -1693,7 +2276,7 @@
                                 <option value="">Sélectionnez un compte</option>
                                 ${this.accounts.map(account => 
                                     `<option value="${account.id}" ${isEdit && transaction.accountId === account.id ? 'selected' : ''}>
-                                        ${account.name} (${this.accountTypes[account.type].name}) - ${account.balance.toFixed(2)}€
+                                        ${account.name} (${this.accountTypes[account.type].name}) - ${this.getBankName(account.bankId)} - ${account.balance.toFixed(2)}€
                                     </option>`
                                 ).join('')}
                             </select>
@@ -1706,7 +2289,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="transaction-type">Type</label>
-                            <select id="transaction-type" ${isEdit ? '' : 'disabled'}>
+                            <select id="transaction-type">
                                 <option value="income" ${transactionType === 'income' ? 'selected' : ''}>Entrée</option>
                                 <option value="expense" ${transactionType === 'expense' ? 'selected' : ''}>Dépense</option>
                             </select>
@@ -1738,7 +2321,7 @@
                 const transferType = isEdit ? transfer.transferType || 'normal' : type;
                 
                 document.getElementById('modal-body').innerHTML = `
-                    <h3 class="modal-title"><i class="fas fa-exchange-alt icon"></i>${isEdit ? 'Modifier' : 'Nouveau'} Virement ${transferType === 'offshore' ? 'Offshore' : ''}</h3>
+                    <h3 class="modal-title"><i class="fas fa-exchange-alt"></i> ${isEdit ? 'Modifier' : 'Nouveau'} Virement ${transferType === 'offshore' ? 'Offshore' : ''}</h3>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="transfer-from">Compte source</label>
@@ -1746,7 +2329,7 @@
                                 <option value="">Sélectionnez un compte</option>
                                 ${this.accounts.map(account => 
                                     `<option value="${account.id}" ${isEdit && transfer.fromAccountId === account.id ? 'selected' : ''}>
-                                        ${account.name} (${this.accountTypes[account.type].name}) - ${account.balance.toFixed(2)}€
+                                        ${account.name} (${this.accountTypes[account.type].name}) - ${this.getBankName(account.bankId)} - ${account.balance.toFixed(2)}€
                                     </option>`
                                 ).join('')}
                             </select>
@@ -1757,7 +2340,7 @@
                                 <option value="">Sélectionnez un compte</option>
                                 ${this.accounts.map(account => 
                                     `<option value="${account.id}" ${isEdit && transfer.toAccountId === account.id ? 'selected' : ''}>
-                                        ${account.name} (${this.accountTypes[account.type].name}) - ${account.balance.toFixed(2)}€
+                                        ${account.name} (${this.accountTypes[account.type].name}) - ${this.getBankName(account.bankId)} - ${account.balance.toFixed(2)}€
                                     </option>`
                                 ).join('')}
                             </select>
@@ -1845,7 +2428,7 @@
                         this.banks.push(bank);
                     }
                     
-                    localStorage.setItem('banks', JSON.stringify(this.banks));
+                    this.saveDataToStorage();
                     this.loadBanks();
                 } 
                 else if (type === 'account') {
@@ -1864,7 +2447,7 @@
                         this.accounts.push(account);
                     }
                     
-                    localStorage.setItem('accounts', JSON.stringify(this.accounts));
+                    this.saveDataToStorage();
                     this.loadAccounts();
                     this.updateDashboards();
                 }
@@ -1881,11 +2464,9 @@
                         simulation: false
                     };
                     
-                    // Mettre à jour le solde du compte
                     const account = this.accounts.find(a => a.id === transaction.accountId);
                     if (account) {
                         if (isEdit) {
-                            // Annuler l'ancienne transaction
                             const oldTransaction = this.transactions.find(t => t.id === transaction.id);
                             if (oldTransaction) {
                                 if (oldTransaction.type === 'income') {
@@ -1896,7 +2477,6 @@
                             }
                         }
                         
-                        // Appliquer la nouvelle transaction
                         if (transaction.type === 'income') {
                             account.balance += transaction.amount;
                         } else {
@@ -1911,8 +2491,7 @@
                         this.transactions.push(transaction);
                     }
                     
-                    localStorage.setItem('accounts', JSON.stringify(this.accounts));
-                    localStorage.setItem('transactions', JSON.stringify(this.transactions));
+                    this.saveDataToStorage();
                     this.loadAccounts();
                     this.loadTransactions();
                     this.updateDashboards();
@@ -1938,7 +2517,6 @@
                         const index = this.transfers.findIndex(t => t.id === transfer.id);
                         this.transfers[index] = transfer;
                         
-                        // Redémarrer le timer si existant
                         if (this.timers[transfer.id]) {
                             clearInterval(this.timers[transfer.id]);
                         }
@@ -1946,23 +2524,31 @@
                         this.transfers.push(transfer);
                     }
                     
-                    // Programmer le virement
                     this.scheduleTransfer(transfer);
-                    
-                    localStorage.setItem('transfers', JSON.stringify(this.transfers));
+                    this.saveDataToStorage();
                     this.loadTransfers();
                 }
                 else if (type === 'hire-employee') {
                     this.hireEmployee();
+                    return;
                 }
                 else if (type === 'buy-equipment') {
                     this.buyEquipment();
+                    return;
                 }
                 else if (type === 'launch-campaign') {
                     this.launchCampaign();
+                    return;
                 }
                 
                 this.closeModal();
+            },
+            
+            saveDataToStorage: function() {
+                localStorage.setItem('banks', JSON.stringify(this.banks));
+                localStorage.setItem('accounts', JSON.stringify(this.accounts));
+                localStorage.setItem('transfers', JSON.stringify(this.transfers));
+                localStorage.setItem('transactions', JSON.stringify(this.transactions));
             },
             
             // Chargement des données dans les tableaux
@@ -2065,32 +2651,32 @@
                 tbody.innerHTML = '';
                 
                 if (this.transactions.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Aucune transaction enregistrée</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">Aucune transaction enregistrée</td></tr>`;
                     return;
                 }
                 
-                // Trier par date (plus récent en premier)
                 const sortedTransactions = [...this.transactions].sort((a, b) => b.date - a.date);
                 
                 sortedTransactions.forEach(transaction => {
                     const account = this.accounts.find(a => a.id === transaction.accountId);
+                    const bank = account ? this.banks.find(b => b.id === account.bankId) : null;
                     const date = new Date(transaction.date);
                     
                     const tr = document.createElement('tr');
-                    if (transaction.simulation) {
-                        tr.classList.add('simulation-transaction');
-                    }
+                    if (transaction.simulation) tr.classList.add('simulation-transaction');
+                    if (account && account.type === 'business') tr.classList.add('business-transaction');
                     
                     tr.innerHTML = `
                         <td>${date.toLocaleDateString()} ${date.toLocaleTimeString()}</td>
                         <td>${transaction.description}</td>
                         <td>${account ? account.name : 'Compte inconnu'}</td>
+                        <td>${bank ? bank.name : 'Banque inconnue'}</td>
                         <td class="${transaction.type === 'income' ? 'positive' : 'negative'}">
                             ${transaction.type === 'income' ? '+' : '-'}${transaction.amount.toFixed(2)} €
                         </td>
                         <td>${transaction.category}</td>
                         <td class="actions-cell">
-                            <button onclick="app.showTransactionForm(null, ${JSON.stringify(transaction)})"><i class="fas fa-edit icon"></i>Modifier</button>
+                            <button onclick="app.showTransactionForm(${JSON.stringify(transaction)})"><i class="fas fa-edit icon"></i>Modifier</button>
                             <button class="delete" onclick="app.deleteTransaction('${transaction.id}')"><i class="fas fa-trash icon"></i>Supprimer</button>
                         </td>
                     `;
@@ -2103,8 +2689,8 @@
                 rows.forEach((row, index) => {
                     if (filter === 'all') {
                         row.style.display = '';
-                    } else if (filter === 'simulation') {
-                        row.style.display = row.classList.contains('simulation-transaction') ? '' : 'none';
+                    } else if (filter === 'business') {
+                        row.style.display = row.classList.contains('business-transaction') ? '' : 'none';
                     } else {
                         const transaction = [...this.transactions].sort((a, b) => b.date - a.date)[index];
                         row.style.display = transaction.type === filter ? '' : 'none';
@@ -2116,14 +2702,11 @@
             deleteBank: function(id) {
                 if (confirm('Voulez-vous vraiment supprimer cette banque ? Cette action supprimera aussi tous les comptes associés.')) {
                     this.banks = this.banks.filter(bank => bank.id !== id);
-                    localStorage.setItem('banks', JSON.stringify(this.banks));
-                    this.loadBanks();
-                    
-                    // Supprimer aussi les comptes associés
                     this.accounts = this.accounts.filter(account => account.bankId !== id);
-                    localStorage.setItem('accounts', JSON.stringify(this.accounts));
-                    this.loadAccounts();
                     
+                    this.saveDataToStorage();
+                    this.loadBanks();
+                    this.loadAccounts();
                     this.updateDashboards();
                 }
             },
@@ -2131,21 +2714,15 @@
             deleteAccount: function(id) {
                 if (confirm('Voulez-vous vraiment supprimer ce compte ? Cette action supprimera aussi tous les virements et transactions associés.')) {
                     this.accounts = this.accounts.filter(account => account.id !== id);
-                    localStorage.setItem('accounts', JSON.stringify(this.accounts));
-                    this.loadAccounts();
-                    
-                    // Supprimer aussi les virements associés
                     this.transfers = this.transfers.filter(transfer => 
                         transfer.fromAccountId !== id && transfer.toAccountId !== id
                     );
-                    localStorage.setItem('transfers', JSON.stringify(this.transfers));
-                    this.loadTransfers();
-                    
-                    // Supprimer les transactions associées
                     this.transactions = this.transactions.filter(t => t.accountId !== id);
-                    localStorage.setItem('transactions', JSON.stringify(this.transactions));
-                    this.loadTransactions();
                     
+                    this.saveDataToStorage();
+                    this.loadAccounts();
+                    this.loadTransfers();
+                    this.loadTransactions();
                     this.updateDashboards();
                 }
             },
@@ -2153,24 +2730,21 @@
             deleteTransfer: function(id) {
                 if (confirm('Voulez-vous vraiment supprimer ce virement programmé ?')) {
                     this.transfers = this.transfers.filter(transfer => transfer.id !== id);
-                    localStorage.setItem('transfers', JSON.stringify(this.transfers));
                     
-                    // Arrêter le timer si existant
                     if (this.timers[id]) {
                         clearInterval(this.timers[id]);
                         delete this.timers[id];
                     }
                     
+                    localStorage.setItem('transfers', JSON.stringify(this.transfers));
                     this.loadTransfers();
                 }
             },
             
             deleteTransaction: function(id) {
                 if (confirm('Voulez-vous vraiment supprimer cette transaction ?')) {
-                    // Récupérer la transaction avant suppression
                     const transaction = this.transactions.find(t => t.id === id);
                     
-                    // Annuler l'effet sur le solde du compte
                     if (transaction) {
                         const account = this.accounts.find(a => a.id === transaction.accountId);
                         if (account) {
@@ -2182,14 +2756,8 @@
                         }
                     }
                     
-                    // Supprimer la transaction
                     this.transactions = this.transactions.filter(t => t.id !== id);
-                    
-                    // Sauvegarder les modifications
-                    localStorage.setItem('accounts', JSON.stringify(this.accounts));
-                    localStorage.setItem('transactions', JSON.stringify(this.transactions));
-                    
-                    // Recharger les affichages
+                    this.saveDataToStorage();
                     this.loadAccounts();
                     this.loadTransactions();
                     this.updateDashboards();
@@ -2203,18 +2771,20 @@
                 });
             },
             
+            stopAllTransfers: function() {
+                Object.values(this.timers).forEach(timer => clearInterval(timer));
+                this.timers = {};
+            },
+            
             scheduleTransfer: function(transfer) {
-                // Arrêter le timer existant si modification
                 if (this.timers[transfer.id]) {
                     clearInterval(this.timers[transfer.id]);
                 }
                 
-                // Programmer le virement
                 this.timers[transfer.id] = setInterval(() => {
                     this.executeTransfer(transfer.id);
                 }, transfer.interval * 1000);
                 
-                // Exécuter immédiatement si c'est un nouveau virement
                 if (!transfer.nextExecution || transfer.nextExecution <= Date.now()) {
                     this.executeTransfer(transfer.id);
                 }
@@ -2242,8 +2812,8 @@
                 fromAccount.balance -= transfer.amount;
                 toAccount.balance += transfer.amount;
                 
-                // Enregistrer la transaction
-                const transaction = {
+                // Enregistrer les transactions
+                this.addTransaction({
                     id: Date.now().toString(),
                     description: `Virement ${transfer.transferType === 'offshore' ? 'offshore' : ''} vers ${toAccount.name}`,
                     accountId: fromAccount.id,
@@ -2253,12 +2823,9 @@
                     date: Date.now(),
                     notes: transfer.notes || '',
                     simulation: false
-                };
+                });
                 
-                this.addTransaction(transaction);
-                
-                // Enregistrer aussi la réception pour le compte destinataire
-                const receivingTransaction = {
+                this.addTransaction({
                     id: Date.now().toString() + '-in',
                     description: `Virement ${transfer.transferType === 'offshore' ? 'offshore' : ''} de ${fromAccount.name}`,
                     accountId: toAccount.id,
@@ -2268,28 +2835,191 @@
                     date: Date.now(),
                     notes: transfer.notes || '',
                     simulation: false
-                };
-                
-                this.addTransaction(receivingTransaction);
+                });
                 
                 // Mettre à jour la date de prochaine exécution
                 transfer.nextExecution = Date.now() + transfer.interval * 1000;
                 
-                // Sauvegarder les modifications
-                localStorage.setItem('accounts', JSON.stringify(this.accounts));
-                localStorage.setItem('transfers', JSON.stringify(this.transfers));
-                
-                // Recharger les affichages
+                this.saveDataToStorage();
                 this.loadAccounts();
                 this.loadTransfers();
                 this.updateDashboards();
+            },
+            
+            // Administration
+            updateJsonViewers: function() {
+                document.getElementById('banks-json').textContent = JSON.stringify(this.banks, null, 2) || 'Aucune donnée';
+                document.getElementById('accounts-json').textContent = JSON.stringify(this.accounts, null, 2) || 'Aucune donnée';
+                document.getElementById('transfers-json').textContent = JSON.stringify(this.transfers, null, 2) || 'Aucune donnée';
+                document.getElementById('transactions-json').textContent = JSON.stringify(this.transactions, null, 2) || 'Aucune donnée';
+                document.getElementById('simulation-json').textContent = JSON.stringify(this.simulation, null, 2) || 'Aucune donnée';
+            },
+            
+            exportAllData: function() {
+                const allData = {
+                    banks: this.banks,
+                    accounts: this.accounts,
+                    transfers: this.transfers,
+                    transactions: this.transactions,
+                    simulation: this.simulation
+                };
                 
-                console.log(`Virement de ${transfer.amount}€ effectué de ${fromAccount.name} vers ${toAccount.name}`);
+                const json = JSON.stringify(allData, null, 2);
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'gestion_bancaire_data.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            },
+            
+            importAllData: function(file) {
+                if (!file) return;
+                
+                this.showLoading(true);
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const allData = JSON.parse(e.target.result);
+                        
+                        this.banks = allData.banks || [];
+                        this.accounts = allData.accounts || [];
+                        this.transfers = allData.transfers || [];
+                        this.transactions = allData.transactions || [];
+                        this.simulation = {
+                            ...this.simulation,
+                            ...(allData.simulation || {}),
+                            running: false,
+                            intervalId: null
+                        };
+                        
+                        this.stopAllTransfers();
+                        this.saveData();
+                        this.loadData();
+                        this.startScheduledTransfers();
+                        this.updateDashboards();
+                        this.updateSimulationDisplay();
+                        this.updateJsonViewers();
+                        
+                        this.logEvent('Toutes les données importées avec succès');
+                    } catch (error) {
+                        console.error('Erreur lors de l\'import des données:', error);
+                        this.logEvent('Erreur lors de l\'import des données: format invalide');
+                    } finally {
+                        this.showLoading(false);
+                    }
+                };
+                
+                reader.readAsText(file);
+            },
+            
+            importData: function(type, file) {
+                if (!file) return;
+                
+                this.showLoading(true);
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        
+                        switch(type) {
+                            case 'banks':
+                                this.banks = data;
+                                break;
+                            case 'accounts':
+                                this.accounts = data;
+                                break;
+                            case 'transfers':
+                                this.transfers = data;
+                                break;
+                            case 'transactions':
+                                this.transactions = data;
+                                break;
+                            case 'simulation':
+                                this.simulation = {
+                                    ...this.simulation,
+                                    ...data,
+                                    running: false,
+                                    intervalId: null
+                                };
+                                break;
+                        }
+                        
+                        this.saveData();
+                        this.loadData();
+                        this.startScheduledTransfers();
+                        this.updateDashboards();
+                        this.updateSimulationDisplay();
+                        this.updateJsonViewers();
+                        
+                        this.logEvent(`Données ${type} importées avec succès`);
+                    } catch (error) {
+                        console.error(`Erreur lors de l'import des données ${type}:`, error);
+                        this.logEvent(`Erreur lors de l'import des données ${type}: format invalide`);
+                    } finally {
+                        this.showLoading(false);
+                    }
+                };
+                
+                reader.readAsText(file);
+            },
+            
+            resetAllData: function() {
+                if (confirm('Êtes-vous sûr de vouloir réinitialiser toutes les données ? Cette action est irréversible.')) {
+                    this.banks = [];
+                    this.accounts = [];
+                    this.transfers = [];
+                    this.transactions = [];
+                    
+                    this.simulation = {
+                        running: false,
+                        currentMonth: 1,
+                        intervalId: null,
+                        speed: 3000,
+                        personal: {
+                            salary: 2500,
+                            livingExpenses: 1800,
+                            randomEvents: true
+                        },
+                        business: {
+                            employees: [],
+                            equipment: [],
+                            campaigns: [],
+                            customers: 0,
+                            baseRevenue: 5000,
+                            performance: 1.0,
+                            marketingImpact: 1.0
+                        },
+                        events: []
+                    };
+                    
+                    this.stopSimulation();
+                    this.stopAllTransfers();
+                    this.saveData();
+                    this.loadData();
+                    this.updateDashboards();
+                    this.updateSimulationDisplay();
+                    this.updateJsonViewers();
+                    
+                    document.getElementById('event-log').innerHTML = `
+                        <div class="event-entry">
+                            <div class="event-date">[Système]</div>
+                            <div class="event-message">Données réinitialisées. Prêt à démarrer une nouvelle simulation.</div>
+                        </div>
+                    `;
+                    
+                    this.logEvent('Toutes les données ont été réinitialisées');
+                }
             },
             
             // Ajouter une transaction (avec gestion des doublons)
             addTransaction: function(transaction) {
-                // Vérifier si la transaction existe déjà
                 const exists = this.transactions.some(t => 
                     t.id === transaction.id || 
                     (t.accountId === transaction.accountId && 
@@ -2303,6 +3033,11 @@
                     localStorage.setItem('transactions', JSON.stringify(this.transactions));
                     this.loadTransactions();
                 }
+            },
+            
+            // Gestion de l'indicateur de chargement
+            showLoading: function(show) {
+                document.getElementById('loading').style.display = show ? 'flex' : 'none';
             }
         };
         
